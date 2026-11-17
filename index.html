@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New York Winter Holiday Trip Itinerary (Dec 2026)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS for Interactive Mapping -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            500: '#e11d48',
+                            600: '#be123c',
+                            700: '#9f1239',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        #map { height: 420px; width: 100%; border-radius: 1.5rem; z-index: 10; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-brand-500/20">
+                    <i class="fa-solid fa-plane-departure"></i>
+                </div>
+                <div>
+                    <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold block">Caribbean Airlines BW520 &rarr; BW525</span>
+                    <h1 class="text-base font-bold text-slate-900 leading-tight">New York Holiday Escape</h1>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="openTab('itinerary')" id="nav-btn-itinerary" class="inline-flex items-center space-x-2 bg-brand-500 text-white px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95 shadow-sm">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span class="hidden sm:inline">Itinerary</span>
+                </button>
+                <button onclick="openTab('mapview')" id="nav-btn-mapview" class="inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95">
+                    <i class="fa-solid fa-map-location-dot text-brand-500"></i>
+                    <span class="hidden sm:inline">Live Map</span>
+                </button>
+                <button onclick="openPackingModal()" class="inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95">
+                    <i class="fa-solid fa-suitcase-rolling text-brand-500"></i>
+                    <span id="packingCountBadge" class="bg-brand-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">14/17</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Hero Trip Dashboard Card -->
+        <div class="relative rounded-3xl overflow-hidden shadow-xl bg-slate-900 text-white mb-10">
+            <!-- Background Image with Overlay -->
+            <div class="absolute inset-0 z-0">
+                <img src="https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=1600&q=80" alt="New York Winter" class="w-full h-full object-cover opacity-40 transform hover:scale-105 transition duration-1000">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent"></div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="relative z-10 p-6 sm:p-10 lg:p-12 flex flex-col justify-between min-h-[340px]">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <span class="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-medium tracking-wide text-white border border-white/10">
+                        <i class="fa-regular fa-calendar-days text-brand-400"></i>
+                        <span>Dec 12 - Dec 23, 2026</span>
+                    </span>
+                    <div class="flex items-center space-x-2 text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-full">
+                        <i class="fa-solid fa-circle text-[8px] animate-pulse"></i>
+                        <span>Flights BW520 & BW525 Confirmed</span>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-3">
+                        New York City Holiday Magic
+                    </h2>
+                    <p class="text-slate-300 text-sm sm:text-base max-w-2xl font-normal leading-relaxed">
+                        Festive lights, Broadway shows, holiday markets, and comfortable split stays at The Gregorian and DoubleTree Times Square South.
+                    </p>
+
+                    <!-- Quick Stats Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-6 border-t border-white/10">
+                        <div class="bg-white/10 backdrop-blur-md p-3.5 rounded-2xl border border-white/10">
+                            <span class="text-slate-400 text-xs font-medium block">Duration</span>
+                            <span class="text-lg font-bold text-white">12 Days / 11 Nights</span>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-3.5 rounded-2xl border border-white/10">
+                            <span class="text-slate-400 text-xs font-medium block">Flights</span>
+                            <span class="text-xs sm:text-sm font-bold text-white">BW520 &rarr; BW525</span>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-3.5 rounded-2xl border border-white/10">
+                            <span class="text-slate-400 text-xs font-medium block">Hotels Split Stay</span>
+                            <span class="text-xs font-bold text-white leading-tight">Gregorian &rarr; DoubleTree</span>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-3.5 rounded-2xl border border-white/10">
+                            <span class="text-slate-400 text-xs font-medium block">Winter Weather</span>
+                            <span class="text-lg font-bold text-white flex items-center space-x-1.5">
+                                <i class="fa-solid fa-snowflake text-sky-300"></i>
+                                <span>-1°C to 6°C</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content Wrapper -->
+        <div id="view-itinerary" class="space-y-8">
+            <!-- Main Content Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Left 2 Columns: Day-by-Day Itinerary -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- Day Selector Tabs -->
+                    <div class="flex items-center space-x-2 overflow-x-auto pb-2 custom-scrollbar">
+                        <button onclick="switchDay(1)" id="tab-1" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-brand-500 text-white shadow-md shadow-brand-500/20">Day 1: Dec 12</button>
+                        <button onclick="switchDay(2)" id="tab-2" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 2: Dec 13</button>
+                        <button onclick="switchDay(3)" id="tab-3" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 3: Dec 14</button>
+                        <button onclick="switchDay(4)" id="tab-4" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 4: Dec 15</button>
+                        <button onclick="switchDay(5)" id="tab-5" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 5: Dec 16</button>
+                        <button onclick="switchDay(6)" id="tab-6" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 6: Dec 17</button>
+                        <button onclick="switchDay(7)" id="tab-7" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 7: Dec 18</button>
+                        <button onclick="switchDay(8)" id="tab-8" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 8: Dec 19</button>
+                        <button onclick="switchDay(9)" id="tab-9" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 9: Dec 20</button>
+                        <button onclick="switchDay(10)" id="tab-10" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 10: Dec 21</button>
+                        <button onclick="switchDay(11)" id="tab-11" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 11: Dec 22</button>
+                        <button onclick="switchDay(12)" id="tab-12" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 12: Dec 23</button>
+                    </div>
+
+                    <!-- Day Content Containers -->
+                    <div id="itinerary-content" class="space-y-6">
+                        <!-- Dynamic content injected via JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Right Column: Flight, Hotels & Packing Checklist -->
+                <div class="space-y-6">
+                    
+                    <!-- Flight Summary Card -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-slate-900 text-base mb-4 flex items-center space-x-2">
+                            <i class="fa-solid fa-plane text-brand-500"></i>
+                            <span>Flight Information</span>
+                        </h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                                <span class="text-xs font-bold text-brand-600 uppercase">Outbound (Dec 12)</span>
+                                <div class="font-bold text-slate-900 mt-1">BW520: POS &rarr; JFK</div>
+                                <div class="text-xs text-slate-500 mt-0.5">Dep: 12:10 AM | Arr: 4:30 AM</div>
+                            </div>
+                            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                                <span class="text-xs font-bold text-brand-600 uppercase">Return (Dec 23)</span>
+                                <div class="font-bold text-slate-900 mt-1">BW525: JFK &rarr; POS</div>
+                                <div class="text-xs text-slate-500 mt-0.5">Dep: 3:20 PM | Arr: 9:20 PM</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Accommodation Split Stay Card -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-slate-900 text-base mb-4 flex items-center space-x-2">
+                            <i class="fa-solid fa-hotel text-brand-500"></i>
+                            <span>Hotels (Split Stay)</span>
+                        </h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                                <span class="text-xs font-bold text-emerald-600 uppercase">Part 1 (Dec 12 - 18)</span>
+                                <div class="font-bold text-slate-900 mt-1">The Gregorian Hotel</div>
+                                <div class="text-xs text-slate-500 mt-0.5">42 W 35th St, New York, NY 10001</div>
+                            </div>
+                            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                                <span class="text-xs font-bold text-emerald-600 uppercase">Part 2 (Dec 18 - 23)</span>
+                                <div class="font-bold text-slate-900 mt-1">DoubleTree Times Square South</div>
+                                <div class="text-xs text-slate-500 mt-0.5">525 8th Ave, New York, NY 10018</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Packing Checklist Widget -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-500 flex items-center justify-center font-bold">
+                                    <i class="fa-solid fa-check-to-slot"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-base">NYC Winter Packing</h3>
+                            </div>
+                            <span id="checklistProgress" class="text-xs font-semibold text-slate-500">14 of 17 packed</span>
+                        </div>
+
+                        <!-- Progress bar -->
+                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mb-5">
+                            <div id="progressBarFill" class="bg-brand-500 h-full transition-all duration-300" style="width: 82%;"></div>
+                        </div>
+
+                        <div id="sidebarChecklist" class="space-y-3 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+                            <!-- Items rendered by JS -->
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+                            <input type="text" id="newItemInput" placeholder="Add custom item..." class="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 outline-none focus:border-brand-500 mr-2">
+                            <button onclick="addNewItem()" class="bg-brand-500 hover:bg-brand-600 text-white px-3.5 py-2 rounded-xl text-sm font-medium transition">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Live Google Maps View -->
+        <div id="view-mapview" class="hidden space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <div>
+                        <span class="text-brand-600 text-xs font-bold uppercase tracking-wider block mb-1">Google Maps Interactive Route</span>
+                        <h3 id="map-title" class="text-2xl font-bold text-slate-900">Day 1 Route & Locations</h3>
+                        <p class="text-slate-500 text-sm mt-1">Numbered pins below update dynamically based on your selected day in the itinerary.</p>
+                    </div>
+                </div>
+
+                <!-- Embedded Google Maps Container -->
+                <div class="relative w-full h-[450px] rounded-2xl overflow-hidden shadow-md border border-slate-200">
+                    <iframe id="google-map-iframe" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps/embed/v1/place?key=&q=Piarco+International+Airport+to+The+Gregorian+Hotel+New+York"></iframe>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-16 py-6 text-center text-xs text-slate-500">
+        <p>&copy; 2026 New York Holiday Trip Planner. Flights BW520 & BW525 Confirmed.</p>
+    </footer>
+
+    <!-- Interactive Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center space-x-3 text-sm font-medium border border-slate-700">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toastMessage">Action completed successfully.</span>
+    </div>
+
+    <!-- JavaScript Data & Logic -->
+    <script>
+        // Itinerary Dataset with GPS coordinates and Google Maps directions links
+        const itineraryData = {
+            1: {
+                day: 1,
+                date: "Saturday, Dec 12, 2026",
+                title: "Arrival via BW520 & Check-in at The Gregorian",
+                subtitle: "Arrive early morning from Piarco and settle into Midtown Manhattan.",
+                mapQuery: "Piarco International Airport to The Gregorian Hotel New York",
+                activities: [
+                    {
+                        num: 1,
+                        time: "12:10 AM",
+                        title: "Flight Departure: BW520 (POS &rarr; JFK)",
+                        category: "Transport",
+                        categoryClass: "bg-blue-50 text-blue-700 border-blue-200",
+                        icon: "fa-plane-departure",
+                        location: "Piarco International Airport (POS)",
+                        duration: "4h 20m flight",
+                        notes: "Board Caribbean Airlines flight BW520 bound for New York JFK Airport.",
+                        image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Piarco+International+Airport"
+                    },
+                    {
+                        num: 2,
+                        time: "04:30 AM",
+                        title: "Arrival at JFK Airport & Transfer to Manhattan",
+                        category: "Transport",
+                        categoryClass: "bg-blue-50 text-blue-700 border-blue-200",
+                        icon: "fa-taxi",
+                        location: "JFK Airport Terminal 4 to Midtown",
+                        duration: "1 hour",
+                        notes: "Clear customs and take a taxi or transit to Manhattan.",
+                        image: "https://images.unsplash.com/photo-1534430480872-3498386e7856?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/dir/?api=1&destination=John+F.+Kennedy+International+Airport+Terminal+4"
+                    },
+                    {
+                        num: 3,
+                        time: "03:00 PM",
+                        title: "Check-in: The Gregorian Hotel",
+                        category: "Hotel",
+                        categoryClass: "bg-emerald-50 text-emerald-700 border-emerald-200",
+                        icon: "fa-hotel",
+                        location: "42 W 35th St, New York, NY 10001",
+                        duration: "Check-in",
+                        notes: "Check into your first hotel stay for the initial 6 nights in Midtown South.",
+                        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=The+Gregorian+Hotel+New+York+42+W+35th+St"
+                    },
+                    {
+                        num: 4,
+                        time: "06:00 PM",
+                        title: "Evening Walk around Herald Square & Empire State",
+                        category: "Sightseeing",
+                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
+                        icon: "fa-city",
+                        location: "34th St & Broadway",
+                        duration: "2 hours",
+                        notes: "Enjoy your first evening view of the illuminated Empire State Building.",
+                        image: "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Empire+State+Building"
+                    }
+                ]
+            },
+            2: {
+                day: 2,
+                date: "Sunday, Dec 13, 2026",
+                title: "Fifth Avenue Holiday Windows & Bryant Park Winter Village",
+                subtitle: "Experience iconic holiday window displays and ice skating.",
+                mapQuery: "Bryant Park New York to Fifth Avenue New York",
+                activities: [
+                    {
+                        num: 1,
+                        time: "10:00 AM",
+                        title: "Bryant Park Winter Village",
+                        category: "Sightseeing",
+                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
+                        icon: "fa-store",
+                        location: "42nd St and 6th Ave",
+                        duration: "2.5 hours",
+                        notes: "Browse artisan holiday shops, warm up with hot cider, and watch skaters.",
+                        image: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Bryant+Park+Winter+Village+New+York"
+                    },
+                    {
+                        num: 2,
+                        time: "02:00 PM",
+                        title: "Fifth Avenue Holiday Window Tour",
+                        category: "Sightseeing",
+                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
+                        icon: "fa-gift",
+                        location: "Fifth Avenue (Saks, Bergdorf Goodman)",
+                        duration: "2 hours",
+                        notes: "Stroll down Fifth Ave to see the legendary animated holiday window displays.",
+                        image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Saks+Fifth+Avenue+New+York"
+                    }
+                ]
+            },
+            3: {
+                day: 3,
+                date: "Monday, Dec 14, 2026",
+                title: "Rockefeller Center & Top of the Rock",
+                subtitle: "See the world-famous Christmas Tree and panoramic skyline views.",
+                mapQuery: "Rockefeller Center New York",
+                activities: [
+                    {
+                        num: 1,
+                        time: "10:00 AM",
+                        title: "St. Patrick's Cathedral & Rockefeller Plaza",
+                        category: "Sightseeing",
+                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
+                        icon: "fa-place-of-worship",
+                        location: "5th Ave & 50th St",
+                        duration: "2 hours",
+                        notes: "Admire the towering Rockefeller Christmas Tree and historic cathedral.",
+                        image: "https://images.unsplash.com/photo-1542640244-7e672d6cef4e?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Rockefeller+Center+New+York"
+                    },
+                    {
+                        num: 2,
+                        time: "03:00 PM",
+                        title: "Top of the Rock Observation Deck",
+                        category: "Sightseeing",
+                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
+                        icon: "fa-binoculars",
+                        location: "30 Rockefeller Plaza",
+                        duration: "2 hours",
+                        notes: "Catch breathtaking sunset views over Central Park and the Manhattan skyline.",
+                        image: "https://images.unsplash.com/photo-1534430480872-3498386e7856?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Top+of+the+Rock+Observation+Deck"
+                    }
+                ]
+            },
+            4: {
+                day: 4,
+                date: "Tuesday, Dec 15, 2026",
+                title: "Statue of Liberty & Financial District",
+                subtitle: "Explore Lady Liberty, Ellis Island, and Wall Street.",
+                mapQuery: "Battery Park Ferry Terminal to Wall Street New York",
+                activities: [
+                    {
+                        num: 1,
+                        time: "09:00 AM",
+                        title: "Statue of Liberty & Ellis Island Ferry",
+                        category: "Sightseeing",
+                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
+                        icon: "fa-monument",
+                        location: "Battery Park Ferry Terminal",
+                        duration: "4 hours",
+                        notes: "Take the morning ferry to visit the Statue of Liberty and immigration museum.",
+                        image: "https://images.unsplash.com/photo-1485738422979-f5c462d49f74?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Battery+Park+New+York"
+                    },
+                    {
+                        num: 2,
+                        time: "02:30 PM",
+                        title: "Wall Street & Charging Bull",
+                        category: "Sightseeing",
+                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
+                        icon: "fa-landmark",
+                        location: "Financial District, Lower Manhattan",
+                        duration: "2 hours",
+                        notes: "Walk through historic Lower Manhattan and visit the Charging Bull.",
+                        image: "https://images.unsplash.com/photo-1522083165195-3424ed129620?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Wall+Street+Charging+Bull+New+York"
+                    }
+                ]
+            },
+            5: {
+                day: 5,
+                date: "Wednesday, Dec 16, 2026",
+                title: "Central Park Stroll & Museum of Natural History",
+                subtitle: "Winter walks in Central Park and world-class exhibits.",
+                mapQuery: "Central Park South to American Museum of Natural History",
+                activities: [
+                    {
+                        num: 1,
+                        time: "10:00 AM",
+                        title: "Central Park Winter Walk & Wollman Rink",
+                        category: "Sightseeing",
+                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
+                        icon: "fa-tree",
+                        location: "Central Park South",
+                        duration: "2.5 hours",
+                        notes: "Stroll scenic paths, Bethesda Terrace, and take in winter scenery.",
+                        image: "https://images.unsplash.com/photo-1509653087829-44f2c589b224?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Central+Park+New+York"
+                    },
+                    {
+                        num: 2,
+                        time: "02:00 PM",
+                        title: "American Museum of Natural History",
+                        category: "Sightseeing",
+                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
+                        icon: "fa-bone",
+                        location: "Central Park West & 79th St",
+                        duration: "3 hours",
+                        notes: "Explore famous dinosaur halls and planetarium exhibits.",
+                        image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=American+Museum+of+Natural+History+New+York"
+                    }
+                ]
+            },
+            6: {
+                day: 6,
+                date: "Thursday, Dec 17, 2026",
+                title: "Museum of Modern Art (MoMA) & Shopping",
+                subtitle: "World-class modern art and holiday shopping in Midtown.",
+                mapQuery: "MoMA New York to Grand Central Terminal",
+                activities: [
+                    {
+                        num: 1,
+                        time: "10:00 AM",
+                        title: "MoMA (Museum of Modern Art)",
+                        category: "Sightseeing",
+                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
+                        icon: "fa-palette",
+                        location: "11 W 53rd St",
+                        duration: "3 hours",
+                        notes: "View masterpieces by Van Gogh, Picasso, and Warhol.",
+                        image: "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=MoMA+New+York"
+                    },
+                    {
+                        num: 2,
+                        time: "03:00 PM",
+                        title: "Grand Central Terminal & Holiday Fair",
+                        category: "Sightseeing",
+                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
+                        icon: "fa-train",
+                        location: "89 E 42nd St",
+                        duration: "2 hours",
+                        notes: "Explore the majestic concourse and indoor holiday market.",
+                        image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Grand+Central+Terminal+New+York"
+                    }
+                ]
+            },
+            7: {
+                day: 7,
+                date: "Friday, Dec 18, 2026",
+                title: "Hotel Move to DoubleTree & Hudson Yards",
+                subtitle: "Transition to hotel part 2 and visit the Vessel and High Line.",
+                mapQuery: "The Gregorian Hotel to DoubleTree Times Square South",
+                activities: [
+                    {
+                        num: 1,
+                        time: "11:00 AM",
+                        title: "Check-out Gregorian & Check-in DoubleTree 8th Ave",
+                        category: "Hotel",
+                        categoryClass: "bg-emerald-50 text-emerald-700 border-emerald-200",
+                        icon: "fa-suitcase-rolling",
+                        location: "From 35th St to 525 8th Ave",
+                        duration: "1 hour",
+                        notes: "Move your luggage to your second accommodation: DoubleTree Times Square South.",
+                        image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=DoubleTree+by+Hilton+New+York+Times+Square+South"
+                    },
+                    {
+                        num: 2,
+                        time: "02:00 PM",
+                        title: "Hudson Yards & The Vessel",
+                        category: "Sightseeing",
+                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
+                        icon: "fa-building",
+                        location: "Hudson Yards, West Side",
+                        duration: "2.5 hours",
+                        notes: "Explore modern architecture, indoor shopping mall, and the High Line park.",
+                        image: "https://images.unsplash.com/photo-1534430480872-3498386e7856?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Hudson+Yards+New+York"
+                    }
+                ]
+            },
+            8: {
+                day: 8,
+                date: "Saturday, Dec 19, 2026",
+                title: "Broadway Show & Times Square Evening",
+                subtitle: "Experience the vibrant energy of Broadway theater district.",
+                mapQuery: "Broadway Theater District New York",
+                activities: [
+                    {
+                        num: 1,
+                        time: "01:00 PM",
+                        title: "Matinee Broadway Show",
+                        category: "Entertainment",
+                        categoryClass: "bg-purple-50 text-purple-700 border-purple-200",
+                        icon: "fa-masks-theater",
+                        location: "Broadway Theater District",
+                        duration: "3 hours",
+                        notes: "Enjoy a world-famous musical or play in the heart of Broadway.",
+                        image: "https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Broadway+Theatre+New+York"
+                    },
+                    {
+                        num: 2,
+                        time: "06:00 PM",
+                        title: "Times Square Neon Lights & Dinner",
+                        category: "Food",
+                        categoryClass: "bg-rose-50 text-rose-700 border-rose-200",
+                        icon: "fa-utensils",
+                        location: "Times Square",
+                        duration: "3 hours",
+                        notes: "Dine near Times Square and soak in the dazzling mega-screens.",
+                        image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Times+Square+New+York"
+                    }
+                ]
+            },
+            9: {
+                day: 9,
+                date: "Sunday, Dec 20, 2026",
+                title: "Chelsea Market & Greenwich Village",
+                subtitle: "Artisan food halls and historic bohemian neighborhoods.",
+                mapQuery: "Chelsea Market to Washington Square Park New York",
+                activities: [
+                    {
+                        num: 1,
+                        time: "10:30 AM",
+                        title: "Chelsea Market Brunch & Shopping",
+                        category: "Food",
+                        categoryClass: "bg-rose-50 text-rose-700 border-rose-200",
+                        icon: "fa-utensils",
+                        location: "75 9th Ave",
+                        duration: "2.5 hours",
+                        notes: "Sample gourmet treats and fresh pastries inside the historic factory market.",
+                        image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Chelsea+Market+New+York"
+                    },
+                    {
+                        num: 2,
+                        time: "02:00 PM",
+                        title: "Greenwich Village & Washington Square Park",
+                        category: "Sightseeing",
+                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
+                        icon: "fa-shoe-prints",
+                        location: "Greenwich Village",
+                        duration: "2.5 hours",
+                        notes: "Wander charming brownstone streets and historic Washington Square Arch.",
+                        image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Washington+Square+Park+New+York"
+                    }
+                ]
+            },
+            10: {
+                day: 10,
+                date: "Monday, Dec 21, 2026",
+                title: "One World Observatory & Brooklyn Bridge",
+                subtitle: "Stunning downtown views and historic bridge walk.",
+                mapQuery: "One World Trade Center to Brooklyn Bridge",
+                activities: [
+                    {
+                        num: 1,
+                        time: "10:00 AM",
+                        title: "One World Observatory",
+                        category: "Sightseeing",
+                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
+                        icon: "fa-eye",
+                        location: "One World Trade Center",
+                        duration: "2.5 hours",
+                        notes: "Experience the highest observation deck in the Western Hemisphere.",
+                        image: "https://images.unsplash.com/photo-1534430480872-3498386e7856?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=One+World+Observatory+New+York"
+                    },
+                    {
+                        num: 2,
+                        time: "02:30 PM",
+                        title: "Brooklyn Bridge Walk & DUMBO",
+                        category: "Sightseeing",
+                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
+                        icon: "fa-bridge",
+                        location: "Brooklyn Bridge to DUMBO",
+                        duration: "2.5 hours",
+                        notes: "Walk across the iconic bridge for classic NYC skyline photos.",
+                        image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Brooklyn+Bridge+New+York"
+                    }
+                ]
+            },
+            11: {
+                day: 11,
+                date: "Tuesday, Dec 22, 2026",
+                title: "SoHo Shopping & Dyker Heights Lights",
+                subtitle: "Explore famous Brooklyn holiday lighting spectacle.",
+                mapQuery: "SoHo New York to Dyker Heights Brooklyn",
+                activities: [
+                    {
+                        num: 1,
+                        time: "11:00 AM",
+                        title: "SoHo Shopping & Boutiques",
+                        category: "Sightseeing",
+                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
+                        icon: "fa-bag-shopping",
+                        location: "SoHo, Manhattan",
+                        duration: "3 hours",
+                        notes: "Browse cobblestone streets, designer boutiques, and cast-iron architecture.",
+                        image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=SoHo+New+York"
+                    },
+                    {
+                        num: 2,
+                        time: "06:00 PM",
+                        title: "Dyker Heights Christmas Lights Tour",
+                        category: "Sightseeing",
+                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
+                        icon: "fa-lightbulb",
+                        location: "Dyker Heights, Brooklyn",
+                        duration: "3 hours",
+                        notes: "Witness the legendary over-the-top residential holiday light displays in Brooklyn.",
+                        image: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Dyker+Heights+Brooklyn+New+York"
+                    }
+                ]
+            },
+            12: {
+                day: 12,
+                date: "Wednesday, Dec 23, 2026",
+                title: "Final Stroll & Return Flight BW525 (JFK &rarr; POS)",
+                subtitle: "Check out and head to JFK for your afternoon flight home to Trinidad.",
+                mapQuery: "DoubleTree Times Square South to JFK Airport Terminal 4",
+                activities: [
+                    {
+                        num: 1,
+                        time: "10:00 AM",
+                        title: "Final Coffee & Souvenir Shopping",
+                        category: "Food",
+                        categoryClass: "bg-rose-50 text-rose-700 border-rose-200",
+                        icon: "fa-mug-hot",
+                        location: "Near Times Square / DoubleTree",
+                        duration: "2 hours",
+                        notes: "Pack your bags, check out of DoubleTree, and grab a farewell NYC coffee.",
+                        image: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=DoubleTree+by+Hilton+New+York+Times+Square+South"
+                    },
+                    {
+                        num: 2,
+                        time: "12:00 PM",
+                        title: "Transfer to JFK Airport Terminal 4",
+                        category: "Transport",
+                        categoryClass: "bg-blue-50 text-blue-700 border-blue-200",
+                        icon: "fa-taxi",
+                        location: "Manhattan to JFK Airport",
+                        duration: "1 hour",
+                        notes: "Take a taxi or transit to JFK Terminal 4 for your return flight.",
+                        image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/dir/?api=1&destination=John+F.+Kennedy+International+Airport+Terminal+4"
+                    },
+                    {
+                        num: 3,
+                        time: "03:20 PM",
+                        title: "Flight Departure: BW525 (JFK &rarr; POS)",
+                        category: "Transport",
+                        categoryClass: "bg-blue-50 text-blue-700 border-blue-200",
+                        icon: "fa-plane-departure",
+                        location: "JFK Airport Terminal 4",
+                        duration: "6 hours flight",
+                        notes: "Board Caribbean Airlines flight BW525 heading back to Piarco International Airport.",
+                        image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=John+F.+Kennedy+International+Airport"
+                    },
+                    {
+                        num: 4,
+                        time: "09:20 PM",
+                        title: "Arrival in Trinidad (POS)",
+                        category: "Transport",
+                        categoryClass: "bg-emerald-50 text-emerald-700 border-emerald-200",
+                        icon: "fa-house-chimney",
+                        location: "Piarco International Airport (POS)",
+                        duration: "Trip Complete",
+                        notes: "Arrive safely back home with wonderful memories of your New York holiday trip!",
+                        image: "https://images.unsplash.com/photo-1534430480872-3498386e7856?auto=format&fit=crop&w=600&q=80",
+                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Piarco+International+Airport"
+                    }
+                ]
+            }
+        };
+
+        // Packing Checklist State
+        let packingItems = [
+            { id: 1, text: "Passports & Flight Confirmations (BW520/BW525)", packed: true },
+            { id: 2, text: "Heavy Winter Coat / Parka", packed: true },
+            { id: 3, text: "Thermal Underwear & Base Layers", packed: true },
+            { id: 4, text: "Waterproof Winter Boots with Good Grip", packed: true },
+            { id: 5, text: "Warm Scarves, Beanies, & Touchscreen Gloves", packed: true },
+            { id: 6, text: "Power Bank & US Wall Adapters", packed: true },
+            { id: 7, text: "MetroCard / Contactless Credit Card for Subway", packed: true },
+            { id: 8, text: "Hotel Confirmation Vouchers (Gregorian & DoubleTree)", packed: true },
+            { id: 9, text: "Camera & Extra SD Cards / Charger", packed: true },
+            { id: 10, text: "Prescription Medications & First Aid", packed: true },
+            { id: 11, text: "Compact Travel Umbrella", packed: false },
+            { id: 12, text: "Lip Balm & Moisturizer (for dry winter air)", packed: true },
+            { id: 13, text: "Daypack for daily city walks", packed: true },
+            { id: 14, text: "Sunglasses (for snowy glare)", packed: false },
+            { id: 15, text: "Hand Warmers (HotHands)", packed: false },
+            { id: 16, text: "Broadway Tickets / Reservation Printouts", packed: true },
+            { id: 17, text: "Reusable Water Bottle", packed: true }
+        ];
+
+        let currentActiveDay = 1;
+
+        // Tab Switching Logic (Itinerary vs Map)
+        function openTab(tabName) {
+            const itinView = document.getElementById('view-itinerary');
+            const mapView = document.getElementById('view-mapview');
+            const btnItin = document.getElementById('nav-btn-itinerary');
+            const btnMap = document.getElementById('nav-btn-mapview');
+
+            if (tabName === 'itinerary') {
+                itinView.classList.remove('hidden');
+                mapView.classList.add('hidden');
+                btnItin.className = "inline-flex items-center space-x-2 bg-brand-500 text-white px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95 shadow-sm";
+                btnMap.className = "inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95";
+            } else {
+                itinView.classList.add('hidden');
+                mapView.classList.remove('hidden');
+                btnMap.className = "inline-flex items-center space-x-2 bg-brand-500 text-white px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95 shadow-sm";
+                btnItin.className = "inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95";
+                
+                // Update Google Maps embed for active day
+                updateGoogleMapEmbed(currentActiveDay);
+            }
+        }
+
+        // Update Google Maps iframe based on active day
+        function updateGoogleMapEmbed(dayNum) {
+            const data = itineraryData[dayNum];
+            if (!data) return;
+
+            const mapTitle = document.getElementById('map-title');
+            const iframe = document.getElementById('google-map-iframe');
+            
+            if (mapTitle) mapTitle.innerText = `Day ${dayNum}: Route & Map Locations`;
+            if (iframe) {
+                const encodedQuery = encodeURIComponent(data.mapQuery);
+                iframe.src = `https://www.google.com/maps/embed/v1/search?key=&q=${encodedQuery}`;
+            }
+        }
+
+        // Render Day Itinerary
+        function switchDay(dayNum) {
+            currentActiveDay = dayNum;
+            
+            // Update Tab styling
+            document.querySelectorAll('.day-tab').forEach((tab) => {
+                tab.className = "day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200";
+            });
+            const activeTab = document.getElementById(`tab-${dayNum}`);
+            if(activeTab) {
+                activeTab.className = "day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-brand-500 text-white shadow-md shadow-brand-500/20";
+            }
+
+            const data = itineraryData[dayNum];
+            const container = document.getElementById('itinerary-content');
+
+            if (!data) return;
+
+            let html = `
+                <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm mb-6">
+                    <div class="border-b border-slate-100 pb-4 mb-6 flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <span class="text-brand-600 text-xs font-bold uppercase tracking-wider block mb-1">${data.date}</span>
+                            <h3 class="text-xl sm:text-2xl font-bold text-slate-900">${data.title}</h3>
+                            <p class="text-slate-500 text-sm mt-1">${data.subtitle}</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="openTab('mapview')" class="bg-brand-50 hover:bg-brand-100 text-brand-600 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center space-x-1.5 border border-brand-200">
+                                <i class="fa-solid fa-map-location-dot"></i>
+                                <span>View Day ${data.day} on Map</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6 relative before:absolute before:inset-0 before:left-4 before:w-0.5 before:bg-slate-100">
+            `;
+
+            data.activities.forEach((act) => {
+                html += `
+                    <div class="relative flex items-start space-x-4 sm:space-x-6 group">
+                        <div class="relative z-10 w-8 h-8 rounded-full bg-brand-500 text-white border-2 border-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-md">
+                            ${act.num}
+                        </div>
+                        <div class="flex-grow bg-slate-50/70 hover:bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 transition shadow-xs hover:shadow-md">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                                <span class="inline-flex items-center space-x-1.5 text-xs font-bold text-slate-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+                                    <i class="fa-regular fa-clock text-brand-500"></i>
+                                    <span>${act.time}</span>
+                                </span>
+                                <span class="text-xs font-semibold px-2.5 py-1 rounded-full border ${act.categoryClass}">
+                                    ${act.category}
+                                </span>
+                            </div>
+
+                            <h4 class="text-base sm:text-lg font-bold text-slate-900 mb-1">${act.title}</h4>
+                            <p class="text-slate-500 text-xs sm:text-sm flex items-center space-x-1 mb-3">
+                                <i class="fa-solid fa-location-dot text-rose-500"></i>
+                                <span>${act.location}</span>
+                            </p>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3 pt-3 border-t border-slate-200/60 items-center">
+                                <div class="md:col-span-2">
+                                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">${act.notes}</p>
+                                    <div class="flex flex-wrap items-center gap-3 mt-3">
+                                        <span class="text-xs font-medium text-slate-400">
+                                            <i class="fa-regular fa-hourglass-half mr-1"></i> Duration: ${act.duration}
+                                        </span>
+                                        <a href="${act.mapsUrl}" target="_blank" class="inline-flex items-center space-x-1.5 bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition shadow-xs">
+                                            <i class="fa-solid fa-diamond-turn-right"></i>
+                                            <span>Get Directions</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="overflow-hidden rounded-xl h-24 md:h-20 shadow-xs border border-slate-200">
+                                    <img src="${act.image}" alt="${act.title}" class="w-full h-full object-cover transform hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/400x200/e2e8f0/64748b?text=New+York'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+
+            // Update map view if open
+            updateGoogleMapEmbed(dayNum);
+        }
+
+        // Render Sidebar Packing Checklist
+        function renderChecklist() {
+            const container = document.getElementById('sidebarChecklist');
+            const progressFill = document.getElementById('progressBarFill');
+            const checklistProgress = document.getElementById('checklistProgress');
+            const packingCountBadge = document.getElementById('packingCountBadge');
+
+            let packedCount = packingItems.filter(i => i.packed).length;
+            let totalCount = packingItems.length;
+            let percent = Math.round((packedCount / totalCount) * 100);
+
+            progressFill.style.width = `${percent}%`;
+            checklistProgress.innerText = `${packedCount} of ${totalCount} packed`;
+            packingCountBadge.innerText = `${packedCount}/${totalCount}`;
+
+            let html = '';
+            packingItems.forEach(item => {
+                html += `
+                    <label class="flex items-center space-x-3 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer transition border border-transparent hover:border-slate-200">
+                        <input type="checkbox" ${item.packed ? 'checked' : ''} onchange="toggleItem(${item.id})" class="w-4 h-4 text-brand-500 rounded border-slate-300 focus:ring-brand-500 cursor-pointer">
+                        <span class="text-sm ${item.packed ? 'line-through text-slate-400 font-normal' : 'text-slate-700 font-medium'} transition">${item.text}</span>
+                    </label>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function toggleItem(id) {
+            const item = packingItems.find(i => i.id === id);
+            if (item) {
+                item.packed = !item.packed;
+                renderChecklist();
+            }
+        }
+
+        function addNewItem() {
+            const input = document.getElementById('newItemInput');
+            const text = input.value.trim();
+            if (text) {
+                packingItems.push({
+                    id: Date.now(),
+                    text: text,
+                    packed: false
+                });
+                input.value = '';
+                renderChecklist();
+                showToast("Item added to packing list");
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toastMessage');
+            msgEl.innerText = message;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+
+        window.onload = function() {
+            switchDay(1);
+            renderChecklist();
+        }
+    </script>
+</body>
+</html>

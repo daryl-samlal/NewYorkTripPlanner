@@ -39,32 +39,36 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         #map { height: 420px; width: 100%; border-radius: 1.5rem; z-index: 10; }
+        @media (max-width: 639px) {
+            .custom-scrollbar::-webkit-scrollbar { height: 4px; }
+            #toast { right: 0.75rem; bottom: 0.75rem; max-width: calc(100vw - 1.5rem); }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
 
     <!-- Top Navigation Bar -->
     <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-brand-500/20">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-0 sm:h-16 flex flex-wrap items-center gap-3">
+            <div class="flex items-center space-x-3 min-w-0 flex-1">
+                <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-brand-500/20">
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
-                <div>
-                    <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold block">Caribbean Airlines BW520 &rarr; BW525</span>
-                    <h1 class="text-base font-bold text-slate-900 leading-tight">New York Holiday Escape</h1>
+                <div class="min-w-0">
+                    <span class="text-[10px] sm:text-xs uppercase tracking-wider text-slate-400 font-semibold block truncate">Caribbean Airlines BW520 &rarr; BW525</span>
+                    <h1 class="text-sm sm:text-base font-bold text-slate-900 leading-tight truncate">New York Holiday Escape</h1>
                 </div>
             </div>
-            <div class="flex items-center space-x-3">
-                <button onclick="openTab('itinerary')" id="nav-btn-itinerary" class="inline-flex items-center space-x-2 bg-brand-500 text-white px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95 shadow-sm">
+            <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
+                <button onclick="openTab('itinerary')" id="nav-btn-itinerary" class="flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-brand-500 text-white px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95 shadow-sm">
                     <i class="fa-solid fa-calendar-days"></i>
                     <span class="hidden sm:inline">Itinerary</span>
                 </button>
-                <button onclick="openTab('mapview')" id="nav-btn-mapview" class="inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95">
+                <button onclick="openTab('mapview')" id="nav-btn-mapview" class="flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95">
                     <i class="fa-solid fa-map-location-dot text-brand-500"></i>
                     <span class="hidden sm:inline">Live Map</span>
                 </button>
-                <button onclick="openPackingModal()" class="inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95">
+                <button onclick="openPackingModal()" class="flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95">
                     <i class="fa-solid fa-suitcase-rolling text-brand-500"></i>
                     <span id="packingCountBadge" class="bg-brand-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">14/17</span>
                 </button>
@@ -73,10 +77,10 @@
     </header>
 
     <!-- Main Container -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8">
         
         <!-- Hero Trip Dashboard Card -->
-        <div class="relative rounded-3xl overflow-hidden shadow-xl bg-slate-900 text-white mb-10">
+        <div class="relative rounded-3xl overflow-hidden shadow-xl bg-slate-900 text-white mb-8 sm:mb-10">
             <!-- Background Image with Overlay -->
             <div class="absolute inset-0 z-0">
                 <img src="https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=1600&q=80" alt="New York Winter" class="w-full h-full object-cover opacity-40 transform hover:scale-105 transition duration-1000">
@@ -84,8 +88,8 @@
             </div>
 
             <!-- Dashboard Content -->
-            <div class="relative z-10 p-6 sm:p-10 lg:p-12 flex flex-col justify-between min-h-[340px]">
-                <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="relative z-10 p-5 sm:p-10 lg:p-12 flex flex-col justify-between">
+                <div class="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                     <span class="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-medium tracking-wide text-white border border-white/10">
                         <i class="fa-regular fa-calendar-days text-brand-400"></i>
                         <span>Dec 12 - Dec 23, 2026</span>
@@ -105,20 +109,20 @@
                     </p>
 
                     <!-- Quick Stats Grid -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-6 border-t border-white/10">
-                        <div class="bg-white/10 backdrop-blur-md p-3.5 rounded-2xl border border-white/10">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-white/10">
+                        <div class="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10">
                             <span class="text-slate-400 text-xs font-medium block">Duration</span>
-                            <span class="text-lg font-bold text-white">12 Days / 11 Nights</span>
+                            <span class="text-base sm:text-lg font-bold text-white leading-snug">12 Days / 11 Nights</span>
                         </div>
-                        <div class="bg-white/10 backdrop-blur-md p-3.5 rounded-2xl border border-white/10">
+                        <div class="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10">
                             <span class="text-slate-400 text-xs font-medium block">Flights</span>
                             <span class="text-xs sm:text-sm font-bold text-white">BW520 &rarr; BW525</span>
                         </div>
-                        <div class="bg-white/10 backdrop-blur-md p-3.5 rounded-2xl border border-white/10">
+                        <div class="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10">
                             <span class="text-slate-400 text-xs font-medium block">Hotels Split Stay</span>
                             <span class="text-xs font-bold text-white leading-tight">Gregorian &rarr; DoubleTree</span>
                         </div>
-                        <div class="bg-white/10 backdrop-blur-md p-3.5 rounded-2xl border border-white/10">
+                        <div class="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10">
                             <span class="text-slate-400 text-xs font-medium block">Winter Weather</span>
                             <span class="text-lg font-bold text-white flex items-center space-x-1.5">
                                 <i class="fa-solid fa-snowflake text-sky-300"></i>
@@ -133,13 +137,13 @@
         <!-- Tab Content Wrapper -->
         <div id="view-itinerary" class="space-y-8">
             <!-- Main Content Layout -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
                 
                 <!-- Left 2 Columns: Day-by-Day Itinerary -->
                 <div class="lg:col-span-2 space-y-6">
                     
                     <!-- Day Selector Tabs -->
-                    <div class="flex items-center space-x-2 overflow-x-auto pb-2 custom-scrollbar">
+                    <div class="flex items-center space-x-2 overflow-x-auto pb-2 custom-scrollbar snap-x">
                         <button onclick="switchDay(1)" id="tab-1" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-brand-500 text-white shadow-md shadow-brand-500/20">Day 1: Dec 12</button>
                         <button onclick="switchDay(2)" id="tab-2" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 2: Dec 13</button>
                         <button onclick="switchDay(3)" id="tab-3" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 3: Dec 14</button>
@@ -239,7 +243,7 @@
 
         <!-- Live Google Maps View -->
         <div id="view-mapview" class="hidden space-y-6">
-            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+            <div class="bg-white rounded-3xl p-4 sm:p-8 border border-slate-200 shadow-sm">
                 <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                     <div>
                         <span class="text-brand-600 text-xs font-bold uppercase tracking-wider block mb-1">Google Maps Interactive Route</span>
@@ -249,7 +253,7 @@
                 </div>
 
                 <!-- Embedded Google Maps Container -->
-                <div class="relative w-full h-[450px] rounded-2xl overflow-hidden shadow-md border border-slate-200">
+                <div class="relative w-full h-[min(450px,60vh)] min-h-[300px] rounded-2xl overflow-hidden shadow-md border border-slate-200">
                     <iframe id="google-map-iframe" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps/embed/v1/place?key=&q=Piarco+International+Airport+to+The+Gregorian+Hotel+New+York"></iframe>
                 </div>
             </div>

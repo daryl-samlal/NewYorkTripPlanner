@@ -291,6 +291,7 @@
     </div>
 
     <!-- JavaScript Data & Logic -->
+    <script src="config.js"></script>
     <script>
         // Itinerary Dataset with GPS coordinates and Google Maps directions links
         const itineraryData = {
@@ -796,6 +797,21 @@
         const planningStorageKey = 'nyc-trip-planning-v1';
         const planningHours = Array.from({ length: 24 }, (_, hour) => hour);
 
+        let tripPlan = {
+            trip: { name: 'New York Holiday Escape', startDate: '2026-12-12', endDate: '2026-12-23' },
+            confirmed: {
+                hotels: [
+                    { name: 'The Gregorian Hotel', from: '2026-12-12', to: '2026-12-18' },
+                    { name: 'DoubleTree Times Square South', from: '2026-12-18', to: '2026-12-23' }
+                ],
+                flights: [
+                    { flight: 'BW520', from: 'POS', to: 'JFK', departure: '2026-12-12T00:10', arrival: '2026-12-12T04:30' },
+                    { flight: 'BW525', from: 'JFK', to: 'POS', departure: '2026-12-23T15:20', arrival: '2026-12-23T21:20' }
+                ]
+            },
+            days: {}
+        };
+
         const confirmedEvents = {
             1: [
                 { from: '00:10', to: '04:30', title: 'Confirmed flight BW520: POS to JFK', detail: 'Caribbean Airlines' },
@@ -807,13 +823,16 @@
         };
 
         function getHotelForDay(dayNum) {
-            if (dayNum <= 6) return 'The Gregorian Hotel (confirmed)';
-            return 'DoubleTree Times Square South (confirmed)';
+            const hotel = tripPlan.confirmed.hotels?.find(stay => dayNum <= 6
+                ? stay.name.includes('Gregorian')
+                : stay.name.includes('DoubleTree'));
+            return hotel ? `${hotel.name} (confirmed)` : 'No hotel recorded';
         }
 
         function getPlanningState() {
             try {
-                return JSON.parse(localStorage.getItem(planningStorageKey) || '{}');
+                const localState = JSON.parse(localStorage.getItem(planningStorageKey) || '{}');
+                return Object.keys(localState).length ? localState : Object.values(tripPlan.days || {}).reduce((all, day) => ({ ...all, ...(day.planning || {}) }), {});
             } catch {
                 return {};
             }
@@ -823,6 +842,66 @@
             const state = getPlanningState();
             state[`${dayNum}-${hour}`] = { ...(state[`${dayNum}-${hour}`] || {}), [field]: value };
             localStorage.setItem(planningStorageKey, JSON.stringify(state));
+            tripPlan.days[dayNum] = {
+                ...(tripPlan.days[dayNum] || {}),
+                planning: state
+            };
+            saveRemotePlan();
+        }
+
+        async function loadTripPlan() {
+            const url = window.TRIP_PLAN_URL;
+            if (!url) return;
+
+            try {
+                const response = await fetch(url, { cache: 'no-store' });
+                if (!response.ok) throw new Error(`Trip plan request failed with status ${response.status}`);
+                const payload = await response.json();
+                const remotePlan = payload.record || payload;
+                tripPlan = {
+                    ...tripPlan,
+                    ...remotePlan,
+                    confirmed: { ...tripPlan.confirmed, ...remotePlan.confirmed },
+                    days: remotePlan.days || {}
+                };
+                localStorage.setItem(
+                    planningStorageKey,
+                    JSON.stringify(Object.values(tripPlan.days).reduce((all, day) => ({ ...all, ...(day.planning || {}) }), {}))
+                );
+                confirmedEvents[1] = tripPlan.confirmed.flights?.[0] ? [{
+                    from: tripPlan.confirmed.flights[0].departure.slice(11, 16),
+                    to: tripPlan.confirmed.flights[0].arrival.slice(11, 16),
+                    title: `Confirmed flight ${tripPlan.confirmed.flights[0].flight}: ${tripPlan.confirmed.flights[0].from} to ${tripPlan.confirmed.flights[0].to}`,
+                    detail: 'Caribbean Airlines'
+                }] : [];
+                confirmedEvents[12] = tripPlan.confirmed.flights?.[1] ? [{
+                    from: tripPlan.confirmed.flights[1].departure.slice(11, 16),
+                    to: tripPlan.confirmed.flights[1].arrival.slice(11, 16),
+                    title: `Confirmed flight ${tripPlan.confirmed.flights[1].flight}: ${tripPlan.confirmed.flights[1].from} to ${tripPlan.confirmed.flights[1].to}`,
+                    detail: 'Caribbean Airlines'
+                }] : [];
+            } catch (error) {
+                console.error('Using local trip plan fallback', error);
+            }
+        }
+
+        async function saveRemotePlan() {
+            const url = window.TRIP_PLAN_URL;
+            const writeKey = window.TRIP_PLAN_WRITE_KEY;
+            if (!url || !writeKey || url.startsWith('./')) return;
+
+            try {
+                await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': writeKey
+                    },
+                    body: JSON.stringify(tripPlan)
+                });
+            } catch (error) {
+                console.error('Unable to save shared trip plan', error);
+            }
         }
 
         function renderPlanningGrid(dayNum) {
@@ -954,7 +1033,12 @@
 
         // Geocode the selected day's activities and draw the route on the pedestrian network.
         async function updateOpenStreetMap(dayNum) {
-            const data = itineraryData[dayNum];
+            const data = {
+                ...(itineraryData[dayNum] || {}),
+                ...(tripPlan.days[dayNum] || {}),
+                day: dayNum,
+                date: tripPlan.days[dayNum]?.date || itineraryData[dayNum]?.date || `Day ${dayNum}`
+            };
             if (!data) return;
 
             const mapTitle = document.getElementById('map-title');
@@ -1140,7 +1224,8 @@
             }, 3000);
         }
 
-        window.onload = function() {
+        window.onload = async function() {
+            await loadTripPlan();
             switchDay(1);
             renderChecklist();
             if ('serviceWorker' in navigator) {

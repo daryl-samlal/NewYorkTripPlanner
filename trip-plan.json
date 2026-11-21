@@ -1,0 +1,51 @@
+{
+  "trip": {
+    "name": "New York Holiday Escape",
+    "startDate": "2026-12-12",
+    "endDate": "2026-12-23"
+  },
+  "confirmed": {
+    "flights": [
+      {
+        "flight": "BW520",
+        "from": "POS",
+        "to": "JFK",
+        "departure": "2026-12-12T00:10",
+        "arrival": "2026-12-12T04:30"
+      },
+      {
+        "flight": "BW525",
+        "from": "JFK",
+        "to": "POS",
+        "departure": "2026-12-23T15:20",
+        "arrival": "2026-12-23T21:20"
+      }
+    ],
+    "hotels": [
+      {
+        "name": "The Gregorian Hotel",
+        "from": "2026-12-12",
+        "to": "2026-12-18"
+      },
+      {
+        "name": "DoubleTree Times Square South",
+        "from": "2026-12-18",
+        "to": "2026-12-23"
+      }
+    ]
+  },
+  "days": {
+    "1": { "date": "Saturday, Dec 12, 2026", "planning": {} },
+    "2": { "date": "Sunday, Dec 13, 2026", "planning": {} },
+    "3": { "date": "Monday, Dec 14, 2026", "planning": {} },
+    "4": { "date": "Tuesday, Dec 15, 2026", "planning": {} },
+    "5": { "date": "Wednesday, Dec 16, 2026", "planning": {} },
+    "6": { "date": "Thursday, Dec 17, 2026", "planning": {} },
+    "7": { "date": "Friday, Dec 18, 2026", "planning": {} },
+    "8": { "date": "Saturday, Dec 19, 2026", "planning": {} },
+    "9": { "date": "Sunday, Dec 20, 2026", "planning": {} },
+    "10": { "date": "Monday, Dec 21, 2026", "planning": {} },
+    "11": { "date": "Tuesday, Dec 22, 2026", "planning": {} },
+    "12": { "date": "Wednesday, Dec 23, 2026", "planning": {} }
+  }
+}

@@ -621,6 +621,19 @@
             return segments;
         }
 
+        function getEventsForDay(dayNum) {
+            const events = [...(confirmedEvents[dayNum] || [])];
+            const previousDayEvents = confirmedEvents[dayNum - 1] || [];
+            previousDayEvents
+                .filter(event => timeToMinutes(event.to) <= timeToMinutes(event.from))
+                .forEach(event => events.unshift({
+                    ...event,
+                    from: '00:00',
+                    to: event.to
+                }));
+            return events;
+        }
+
         function getPlanningSegments(dayEvents) {
             const segments = [];
             let cursor = 0;
@@ -628,7 +641,9 @@
                 .map(event => ({
                     ...event,
                     start: timeToMinutes(event.from),
-                    end: timeToMinutes(event.to)
+                    end: timeToMinutes(event.to) <= timeToMinutes(event.from)
+                        ? timeToMinutes(event.to) + 1440
+                        : timeToMinutes(event.to)
                 }))
                 .filter(event => event.end > event.start)
                 .sort((a, b) => a.start - b.start);
@@ -650,7 +665,7 @@
         }
 
         function getOpenTimeLabel(dayNum) {
-            const openMinutes = getPlanningSegments(confirmedEvents[dayNum] || [])
+            const openMinutes = getPlanningSegments(getEventsForDay(dayNum))
                 .filter(segment => segment.type === 'open')
                 .reduce((total, segment) => total + segment.end - segment.start, 0);
             const hours = Math.floor(openMinutes / 60);
@@ -660,7 +675,7 @@
 
         function renderPlanningGrid(dayNum) {
             const state = getPlanningState();
-            const dayEvents = confirmedEvents[dayNum] || [];
+            const dayEvents = getEventsForDay(dayNum);
             const segments = getPlanningSegments(dayEvents);
 
             return segments.map(segment => {

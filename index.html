@@ -89,6 +89,10 @@
                     <i class="fa-solid fa-suitcase-rolling text-brand-500"></i>
                     <span id="packingCountBadge" class="bg-brand-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">14/17</span>
                 </button>
+                <button onclick="installPWA()" id="install-app-btn" class="hidden flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95">
+                    <i class="fa-solid fa-download text-brand-500"></i>
+                    <span class="hidden sm:inline">Install App</span>
+                </button>
             </div>
         </div>
     </header>
@@ -794,6 +798,7 @@
         let routeMap;
         const geocodeCache = new Map();
         let routeRequestId = 0;
+        let deferredInstallPrompt;
         const planningStorageKey = 'nyc-trip-planning-v1';
         const planningHours = Array.from({ length: 24 }, (_, hour) => hour);
 
@@ -1231,6 +1236,30 @@
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('./sw.js').catch(error => console.error('PWA setup failed', error));
             }
+        }
+
+        window.addEventListener('beforeinstallprompt', event => {
+            event.preventDefault();
+            deferredInstallPrompt = event;
+            document.getElementById('install-app-btn')?.classList.remove('hidden');
+        });
+
+        window.addEventListener('appinstalled', () => {
+            deferredInstallPrompt = null;
+            document.getElementById('install-app-btn')?.classList.add('hidden');
+            showToast('App installed successfully');
+        });
+
+        async function installPWA() {
+            if (!deferredInstallPrompt) {
+                showToast('Use your browser menu and choose Add to Home screen');
+                return;
+            }
+
+            deferredInstallPrompt.prompt();
+            await deferredInstallPrompt.userChoice;
+            deferredInstallPrompt = null;
+            document.getElementById('install-app-btn')?.classList.add('hidden');
         }
     </script>
 </body>

@@ -912,7 +912,20 @@
         function renderPlanningGrid(dayNum) {
             const state = getPlanningState();
             const dayEvents = confirmedEvents[dayNum] || [];
+            
+            function isHourBlocked(hour) {
+                const hourStr = String(hour).padStart(2, '0');
+                return dayEvents.some(event => {
+                    const [startHour] = event.from.split(':').map(Number);
+                    const [endHour] = event.to.split(':').map(Number);
+                    const currentHour = hour;
+                    return currentHour >= startHour && currentHour < endHour;
+                });
+            }
+            
             return planningHours.map(hour => {
+                if (isHourBlocked(hour)) return '';
+                
                 const slot = state[`${dayNum}-${hour}`] || {};
                 const confirmed = dayEvents.find(event => event.from.startsWith(String(hour).padStart(2, '0') + ':'));
                 const nextHour = String((hour + 1) % 24).padStart(2, '0');

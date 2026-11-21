@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Leaflet CSS for Interactive Mapping -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script>
         tailwind.config = {
             theme: {
@@ -246,16 +247,16 @@
             <div class="bg-white rounded-3xl p-4 sm:p-8 border border-slate-200 shadow-sm">
                 <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                     <div>
-                        <span class="text-brand-600 text-xs font-bold uppercase tracking-wider block mb-1">Google Maps Interactive Route</span>
+                        <span class="text-brand-600 text-xs font-bold uppercase tracking-wider block mb-1">OpenStreetMap Interactive Route</span>
                         <h3 id="map-title" class="text-2xl font-bold text-slate-900">Day 1 Route & Locations</h3>
                         <p class="text-slate-500 text-sm mt-1">Suggested routes and locations update dynamically based on your selected day in the itinerary.</p>
-                        <p id="map-status" class="text-amber-600 text-xs mt-2 hidden"></p>
+                        <p id="map-status" class="text-slate-500 text-xs mt-2"></p>
                     </div>
                 </div>
 
                 <!-- Embedded Google Maps Container -->
                 <div class="relative w-full h-[min(450px,60vh)] min-h-[300px] rounded-2xl overflow-hidden shadow-md border border-slate-200">
-                    <iframe id="google-map-iframe" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Google Maps route for the selected day"></iframe>
+                    <div id="route-map" class="w-full h-full" role="application" aria-label="OpenStreetMap route for the selected day"></div>
                 </div>
             </div>
         </div>
@@ -274,7 +275,6 @@
     </div>
 
     <!-- JavaScript Data & Logic -->
-    <script src="config.js?v=2"></script>
     <script>
         // Itinerary Dataset with GPS coordinates and Google Maps directions links
         const itineraryData = {
@@ -774,8 +774,8 @@
         ];
 
         let currentActiveDay = 1;
-        // Inject this value at deploy time; do not commit API keys to the repository.
-        const GOOGLE_MAPS_API_KEY = window.GOOGLE_MAPS_API_KEY || '';
+        let routeMap;
+        const geocodeCache = new Map();
 
         // Tab Switching Logic (Itinerary vs Map)
         function openTab(tabName) {
@@ -795,48 +795,87 @@
                 btnMap.className = "inline-flex items-center space-x-2 bg-brand-500 text-white px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95 shadow-sm";
                 btnItin.className = "inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95";
                 
-                // Update Google Maps embed for active day
-                updateGoogleMapEmbed(currentActiveDay);
+                updateOpenStreetMap(currentActiveDay);
+                setTimeout(() => routeMap?.invalidateSize(), 0);
             }
         }
 
-        // Update Google Maps iframe based on active day.
-        function updateGoogleMapEmbed(dayNum) {
+        function initializeRouteMap() {
+            if (routeMap || !window.L) return;
+
+            routeMap = L.map('route-map').setView([40.758, -73.985], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(routeMap);
+        }
+
+        async function geocodeLocation(location) {
+            if (geocodeCache.has(location)) return geocodeCache.get(location);
+
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(location + ', New York')}`);
+            if (!response.ok) throw new Error(`Geocoding failed for ${location}`);
+
+            const results = await response.json();
+            const result = results[0];
+            const coordinates = result ? [Number(result.lat), Number(result.lon)] : null;
+            geocodeCache.set(location, coordinates);
+            return coordinates;
+        }
+
+        // Geocode the selected day's activities and draw a connected suggested route.
+        async function updateOpenStreetMap(dayNum) {
             const data = itineraryData[dayNum];
             if (!data) return;
 
             const mapTitle = document.getElementById('map-title');
-            const iframe = document.getElementById('google-map-iframe');
             const mapStatus = document.getElementById('map-status');
-            
+            initializeRouteMap();
             if (mapTitle) mapTitle.innerText = `Day ${dayNum}: Route & Map Locations`;
-            if (!iframe || !mapStatus) return;
+            if (!routeMap || !mapStatus) return;
 
-            if (!GOOGLE_MAPS_API_KEY) {
-                iframe.removeAttribute('src');
-                mapStatus.innerText = 'Add a restricted Google Maps API key through window.GOOGLE_MAPS_API_KEY to display this route.';
-                mapStatus.classList.remove('hidden');
-                return;
-            }
-
-            const locations = data.activities
-                .map(activity => activity.location)
-                .filter(Boolean);
-            const origin = locations[0] || data.mapQuery;
-            const destination = locations[locations.length - 1] || data.mapQuery;
-            const waypoints = locations.slice(1, -1).join('|');
-            const params = new URLSearchParams({
-                key: GOOGLE_MAPS_API_KEY,
-                origin,
-                destination,
-                mode: 'walking'
+            mapStatus.innerText = 'Loading locations...';
+            routeMap.eachLayer(layer => {
+                if (layer instanceof L.Marker || layer instanceof L.Polyline) routeMap.removeLayer(layer);
             });
 
-            if (waypoints) params.set('waypoints', waypoints);
+            try {
+                const locations = await Promise.all(data.activities.map(async activity => ({
+                    activity,
+                    coordinates: await geocodeLocation(activity.location)
+                })));
+                const mappedLocations = locations.filter(location => location.coordinates);
 
-            iframe.src = `https://www.google.com/maps/embed/v1/directions?${params.toString()}`;
-            mapStatus.classList.add('hidden');
+                if (!mappedLocations.length) {
+                    mapStatus.innerText = 'No map locations could be found for this day.';
+                    return;
+                }
+
+                const routePoints = mappedLocations.map(location => location.coordinates);
+                mappedLocations.forEach(({ activity, coordinates }) => {
+                    L.marker(coordinates)
+                        .addTo(routeMap)
+                        .bindPopup(`<strong>${activity.num}. ${activity.title}</strong><br>${activity.location}`);
+                });
+                L.polyline(routePoints, {
+                    color: '#e11d48',
+                    weight: 5,
+                    opacity: 0.8,
+                    dashArray: '8 8'
+                }).addTo(routeMap);
+
+                routeMap.fitBounds(L.latLngBounds(routePoints), { padding: [24, 24] });
+                mapStatus.innerText = `${mappedLocations.length} itinerary locations connected with a suggested route.`;
+            } catch (error) {
+                mapStatus.innerText = 'Map locations could not be loaded. Please try again later.';
+                console.error(error);
+            }
         }
+
+        /*
+         * The OpenStreetMap route is a visual itinerary connection, not turn-by-turn
+         * navigation. Use a dedicated routing provider for driving or walking directions.
+         */
 
         // Render Day Itinerary
         function switchDay(dayNum) {
@@ -928,7 +967,7 @@
             container.innerHTML = html;
 
             // Update map view if open
-            updateGoogleMapEmbed(dayNum);
+            updateOpenStreetMap(dayNum);
         }
 
         // Render Sidebar Packing Checklist

@@ -72,8 +72,8 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div class="min-w-0">
-                    <span class="hidden sm:block text-xs uppercase tracking-wider text-slate-400 font-semibold truncate">Caribbean Airlines BW520 &rarr; BW525</span>
-                    <h1 class="text-sm sm:text-base font-bold text-slate-900 leading-tight truncate">New York Holiday Escape</h1>
+                    <span id="header-trip-label" class="hidden sm:block text-xs uppercase tracking-wider text-slate-400 font-semibold truncate"></span>
+                    <h1 id="header-trip-name" class="text-sm sm:text-base font-bold text-slate-900 leading-tight truncate"></h1>
                 </div>
             </div>
             <div class="flex items-center justify-between sm:justify-end gap-1.5 sm:gap-2 w-full sm:w-auto">
@@ -87,7 +87,7 @@
                 </button>
                 <button onclick="openPackingModal()" class="flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-sm font-medium transition active:scale-95">
                     <i class="fa-solid fa-suitcase-rolling text-brand-500"></i>
-                    <span id="packingCountBadge" class="bg-brand-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">14/17</span>
+                    <span id="packingCountBadge" class="bg-brand-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">0/0</span>
                 </button>
                 <button onclick="installPWA()" id="install-app-btn" class="hidden flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-sm font-medium transition active:scale-95">
                     <i class="fa-solid fa-download text-brand-500"></i>
@@ -104,7 +104,7 @@
         <div class="relative rounded-3xl overflow-hidden shadow-xl bg-slate-900 text-white mb-8 sm:mb-10">
             <!-- Background Image with Overlay -->
             <div class="absolute inset-0 z-0">
-                <img src="https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=1600&q=80" alt="New York Winter" class="w-full h-full object-cover opacity-40 transform hover:scale-105 transition duration-1000">
+                <img id="hero-image" src="" alt="" class="w-full h-full object-cover opacity-40 transform hover:scale-105 transition duration-1000">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent"></div>
             </div>
 
@@ -113,41 +113,37 @@
                 <div class="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                     <span class="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-medium tracking-wide text-white border border-white/10">
                         <i class="fa-regular fa-calendar-days text-brand-400"></i>
-                        <span>Dec 12 - Dec 23, 2026</span>
+                        <span id="trip-date-range"></span>
                     </span>
-                    <div class="flex items-center space-x-2 text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-full">
+                    <div id="flight-status-pill" class="flex items-center space-x-2 text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-full">
                         <i class="fa-solid fa-circle text-[8px] animate-pulse"></i>
-                        <span>Flights BW520 & BW525 Confirmed</span>
+                        <span id="flight-status"></span>
                     </div>
                 </div>
 
                 <div class="mt-8">
-                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-3">
-                        New York City Holiday Magic
-                    </h2>
-                    <p class="text-slate-300 text-sm sm:text-base max-w-2xl font-normal leading-relaxed">
-                        Festive lights, Broadway shows, holiday markets, and comfortable split stays at The Gregorian and DoubleTree Times Square South.
-                    </p>
+                    <h2 id="trip-title" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-3"></h2>
+                    <p id="trip-subtitle" class="text-slate-300 text-sm sm:text-base max-w-2xl font-normal leading-relaxed"></p>
 
                     <!-- Quick Stats Grid -->
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-white/10">
                         <div class="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10">
                             <span class="text-slate-400 text-xs font-medium block">Duration</span>
-                            <span class="text-base sm:text-lg font-bold text-white leading-snug">12 Days / 11 Nights</span>
+                            <span id="trip-duration" class="text-base sm:text-lg font-bold text-white leading-snug"></span>
                         </div>
                         <div class="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10">
                             <span class="text-slate-400 text-xs font-medium block">Flights</span>
-                            <span class="text-xs sm:text-sm font-bold text-white">BW520 &rarr; BW525</span>
+                            <span id="trip-flights" class="text-xs sm:text-sm font-bold text-white"></span>
                         </div>
                         <div class="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10">
                             <span class="text-slate-400 text-xs font-medium block">Hotels Split Stay</span>
-                            <span class="text-xs font-bold text-white leading-tight">Gregorian &rarr; DoubleTree</span>
+                            <span id="trip-hotels" class="text-xs font-bold text-white leading-tight"></span>
                         </div>
                         <div class="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10">
                             <span class="text-slate-400 text-xs font-medium block">Winter Weather</span>
                             <span class="text-lg font-bold text-white flex items-center space-x-1.5">
                                 <i class="fa-solid fa-snowflake text-sky-300"></i>
-                                <span>-1°C to 6°C</span>
+                                <span id="trip-weather"></span>
                             </span>
                         </div>
                     </div>
@@ -164,20 +160,7 @@
                 <div class="lg:col-span-2 space-y-6">
                     
                     <!-- Day Selector Tabs -->
-                    <div class="flex items-center space-x-2 overflow-x-auto pb-2 custom-scrollbar snap-x">
-                        <button onclick="switchDay(1)" id="tab-1" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-brand-500 text-white shadow-md shadow-brand-500/20">Day 1: Dec 12</button>
-                        <button onclick="switchDay(2)" id="tab-2" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 2: Dec 13</button>
-                        <button onclick="switchDay(3)" id="tab-3" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 3: Dec 14</button>
-                        <button onclick="switchDay(4)" id="tab-4" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 4: Dec 15</button>
-                        <button onclick="switchDay(5)" id="tab-5" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 5: Dec 16</button>
-                        <button onclick="switchDay(6)" id="tab-6" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 6: Dec 17</button>
-                        <button onclick="switchDay(7)" id="tab-7" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 7: Dec 18</button>
-                        <button onclick="switchDay(8)" id="tab-8" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 8: Dec 19</button>
-                        <button onclick="switchDay(9)" id="tab-9" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 9: Dec 20</button>
-                        <button onclick="switchDay(10)" id="tab-10" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 10: Dec 21</button>
-                        <button onclick="switchDay(11)" id="tab-11" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 11: Dec 22</button>
-                        <button onclick="switchDay(12)" id="tab-12" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">Day 12: Dec 23</button>
-                    </div>
+                    <div id="day-selector" class="flex items-center space-x-2 overflow-x-auto pb-2 custom-scrollbar snap-x"></div>
 
                     <!-- Day Content Containers -->
                     <div id="itinerary-content" class="space-y-6">
@@ -189,45 +172,10 @@
                 <div class="space-y-6">
                     
                     <!-- Flight Summary Card -->
-                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-                        <h3 class="font-bold text-slate-900 text-base mb-4 flex items-center space-x-2">
-                            <i class="fa-solid fa-plane text-brand-500"></i>
-                            <span>Flight Information</span>
-                        </h3>
-                        <div class="space-y-3 text-sm">
-                            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-                                <span class="text-xs font-bold text-brand-600 uppercase">Outbound (Dec 12)</span>
-                                <div class="font-bold text-slate-900 mt-1">BW520: POS &rarr; JFK</div>
-                                <div class="text-xs text-slate-500 mt-0.5">Dep: 12:10 AM | Arr: 4:30 AM</div>
-                            </div>
-                            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-                                <span class="text-xs font-bold text-brand-600 uppercase">Return (Dec 23)</span>
-                                <div class="font-bold text-slate-900 mt-1">BW525: JFK &rarr; POS</div>
-                                <div class="text-xs text-slate-500 mt-0.5">Dep: 3:20 PM | Arr: 9:20 PM</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Accommodation Split Stay Card -->
-                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-                        <h3 class="font-bold text-slate-900 text-base mb-4 flex items-center space-x-2">
-                            <i class="fa-solid fa-hotel text-brand-500"></i>
-                            <span>Hotels (Split Stay)</span>
-                        </h3>
-                        <div class="space-y-3 text-sm">
-                            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-                                <span class="text-xs font-bold text-emerald-600 uppercase">Part 1 (Dec 12 - 18)</span>
-                                <div class="font-bold text-slate-900 mt-1">The Gregorian Hotel</div>
-                                <div class="text-xs text-slate-500 mt-0.5">42 W 35th St, New York, NY 10001</div>
-                            </div>
-                            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-                                <span class="text-xs font-bold text-emerald-600 uppercase">Part 2 (Dec 18 - 23)</span>
-                                <div class="font-bold text-slate-900 mt-1">DoubleTree Times Square South</div>
-                                <div class="text-xs text-slate-500 mt-0.5">525 8th Ave, New York, NY 10018</div>
-                            </div>
-                        </div>
-                    </div>
-
+                    <div id="flight-summary" class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm"></div>
+                    <!-- Flight summary is populated from JSONBin. -->
+                    <div id="accommodation-summary" class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm"></div>
+                    <!-- Accommodation summary is populated from JSONBin. -->
                     <!-- Packing Checklist Widget -->
                     <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
                         <div class="flex items-center justify-between mb-4">
@@ -285,7 +233,7 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 mt-16 py-6 text-center text-xs text-slate-500">
-        <p>&copy; 2026 New York Holiday Trip Planner. Flights BW520 & BW525 Confirmed.</p>
+        <p id="footer-text"></p>
     </footer>
 
     <!-- Interactive Toast Notification -->
@@ -340,502 +288,8 @@
     <script src="config.js"></script>
     <script>
         // Itinerary Dataset with GPS coordinates and Google Maps directions links
-        const itineraryData = {
-            1: {
-                day: 1,
-                date: "Saturday, Dec 12, 2026",
-                title: "Arrival via BW520 & Check-in at The Gregorian",
-                subtitle: "Arrive early morning from Piarco and settle into Midtown Manhattan.",
-                mapQuery: "Piarco International Airport to The Gregorian Hotel New York",
-                activities: [
-                    {
-                        num: 1,
-                        time: "12:10 AM",
-                        title: "Flight Departure: BW520 (POS &rarr; JFK)",
-                        category: "Transport",
-                        categoryClass: "bg-blue-50 text-blue-700 border-blue-200",
-                        icon: "fa-plane-departure",
-                        location: "Piarco International Airport (POS)",
-                        duration: "4h 20m flight",
-                        notes: "Board Caribbean Airlines flight BW520 bound for New York JFK Airport.",
-                        image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Piarco+International+Airport"
-                    },
-                    {
-                        num: 2,
-                        time: "04:30 AM",
-                        title: "Arrival at JFK Airport & Transfer to Manhattan",
-                        category: "Transport",
-                        categoryClass: "bg-blue-50 text-blue-700 border-blue-200",
-                        icon: "fa-taxi",
-                        location: "JFK Airport Terminal 4 to Midtown",
-                        duration: "1 hour",
-                        notes: "Clear customs and take a taxi or transit to Manhattan.",
-                        image: "https://images.unsplash.com/photo-1534430480872-3498386e7856?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/dir/?api=1&destination=John+F.+Kennedy+International+Airport+Terminal+4"
-                    },
-                    {
-                        num: 3,
-                        time: "03:00 PM",
-                        title: "Check-in: The Gregorian Hotel",
-                        category: "Hotel",
-                        categoryClass: "bg-emerald-50 text-emerald-700 border-emerald-200",
-                        icon: "fa-hotel",
-                        location: "42 W 35th St, New York, NY 10001",
-                        duration: "Check-in",
-                        notes: "Check into your first hotel stay for the initial 6 nights in Midtown South.",
-                        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=The+Gregorian+Hotel+New+York+42+W+35th+St"
-                    },
-                    {
-                        num: 4,
-                        time: "06:00 PM",
-                        title: "Evening Walk around Herald Square & Empire State",
-                        category: "Sightseeing",
-                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
-                        icon: "fa-city",
-                        location: "34th St & Broadway",
-                        duration: "2 hours",
-                        notes: "Enjoy your first evening view of the illuminated Empire State Building.",
-                        image: "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Empire+State+Building"
-                    }
-                ]
-            },
-            2: {
-                day: 2,
-                date: "Sunday, Dec 13, 2026",
-                title: "Fifth Avenue Holiday Windows & Bryant Park Winter Village",
-                subtitle: "Experience iconic holiday window displays and ice skating.",
-                mapQuery: "Bryant Park New York to Fifth Avenue New York",
-                activities: [
-                    {
-                        num: 1,
-                        time: "10:00 AM",
-                        title: "Bryant Park Winter Village",
-                        category: "Sightseeing",
-                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
-                        icon: "fa-store",
-                        location: "42nd St and 6th Ave",
-                        duration: "2.5 hours",
-                        notes: "Browse artisan holiday shops, warm up with hot cider, and watch skaters.",
-                        image: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Bryant+Park+Winter+Village+New+York"
-                    },
-                    {
-                        num: 2,
-                        time: "02:00 PM",
-                        title: "Fifth Avenue Holiday Window Tour",
-                        category: "Sightseeing",
-                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
-                        icon: "fa-gift",
-                        location: "Fifth Avenue (Saks, Bergdorf Goodman)",
-                        duration: "2 hours",
-                        notes: "Stroll down Fifth Ave to see the legendary animated holiday window displays.",
-                        image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Saks+Fifth+Avenue+New+York"
-                    }
-                ]
-            },
-            3: {
-                day: 3,
-                date: "Monday, Dec 14, 2026",
-                title: "Rockefeller Center & Top of the Rock",
-                subtitle: "See the world-famous Christmas Tree and panoramic skyline views.",
-                mapQuery: "Rockefeller Center New York",
-                activities: [
-                    {
-                        num: 1,
-                        time: "10:00 AM",
-                        title: "St. Patrick's Cathedral & Rockefeller Plaza",
-                        category: "Sightseeing",
-                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
-                        icon: "fa-place-of-worship",
-                        location: "5th Ave & 50th St",
-                        duration: "2 hours",
-                        notes: "Admire the towering Rockefeller Christmas Tree and historic cathedral.",
-                        image: "https://images.unsplash.com/photo-1542640244-7e672d6cef4e?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Rockefeller+Center+New+York"
-                    },
-                    {
-                        num: 2,
-                        time: "03:00 PM",
-                        title: "Top of the Rock Observation Deck",
-                        category: "Sightseeing",
-                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
-                        icon: "fa-binoculars",
-                        location: "30 Rockefeller Plaza",
-                        duration: "2 hours",
-                        notes: "Catch breathtaking sunset views over Central Park and the Manhattan skyline.",
-                        image: "https://images.unsplash.com/photo-1534430480872-3498386e7856?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Top+of+the+Rock+Observation+Deck"
-                    }
-                ]
-            },
-            4: {
-                day: 4,
-                date: "Tuesday, Dec 15, 2026",
-                title: "Statue of Liberty & Financial District",
-                subtitle: "Explore Lady Liberty, Ellis Island, and Wall Street.",
-                mapQuery: "Battery Park Ferry Terminal to Wall Street New York",
-                activities: [
-                    {
-                        num: 1,
-                        time: "09:00 AM",
-                        title: "Statue of Liberty & Ellis Island Ferry",
-                        category: "Sightseeing",
-                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
-                        icon: "fa-monument",
-                        location: "Battery Park Ferry Terminal",
-                        duration: "4 hours",
-                        notes: "Take the morning ferry to visit the Statue of Liberty and immigration museum.",
-                        image: "https://images.unsplash.com/photo-1485738422979-f5c462d49f74?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Battery+Park+New+York"
-                    },
-                    {
-                        num: 2,
-                        time: "02:30 PM",
-                        title: "Wall Street & Charging Bull",
-                        category: "Sightseeing",
-                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
-                        icon: "fa-landmark",
-                        location: "Financial District, Lower Manhattan",
-                        duration: "2 hours",
-                        notes: "Walk through historic Lower Manhattan and visit the Charging Bull.",
-                        image: "https://images.unsplash.com/photo-1522083165195-3424ed129620?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Wall+Street+Charging+Bull+New+York"
-                    }
-                ]
-            },
-            5: {
-                day: 5,
-                date: "Wednesday, Dec 16, 2026",
-                title: "Central Park Stroll & Museum of Natural History",
-                subtitle: "Winter walks in Central Park and world-class exhibits.",
-                mapQuery: "Central Park South to American Museum of Natural History",
-                activities: [
-                    {
-                        num: 1,
-                        time: "10:00 AM",
-                        title: "Central Park Winter Walk & Wollman Rink",
-                        category: "Sightseeing",
-                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
-                        icon: "fa-tree",
-                        location: "Central Park South",
-                        duration: "2.5 hours",
-                        notes: "Stroll scenic paths, Bethesda Terrace, and take in winter scenery.",
-                        image: "https://images.unsplash.com/photo-1509653087829-44f2c589b224?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Central+Park+New+York"
-                    },
-                    {
-                        num: 2,
-                        time: "02:00 PM",
-                        title: "American Museum of Natural History",
-                        category: "Sightseeing",
-                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
-                        icon: "fa-bone",
-                        location: "Central Park West & 79th St",
-                        duration: "3 hours",
-                        notes: "Explore famous dinosaur halls and planetarium exhibits.",
-                        image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=American+Museum+of+Natural+History+New+York"
-                    }
-                ]
-            },
-            6: {
-                day: 6,
-                date: "Thursday, Dec 17, 2026",
-                title: "Museum of Modern Art (MoMA) & Shopping",
-                subtitle: "World-class modern art and holiday shopping in Midtown.",
-                mapQuery: "MoMA New York to Grand Central Terminal",
-                activities: [
-                    {
-                        num: 1,
-                        time: "10:00 AM",
-                        title: "MoMA (Museum of Modern Art)",
-                        category: "Sightseeing",
-                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
-                        icon: "fa-palette",
-                        location: "11 W 53rd St",
-                        duration: "3 hours",
-                        notes: "View masterpieces by Van Gogh, Picasso, and Warhol.",
-                        image: "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=MoMA+New+York"
-                    },
-                    {
-                        num: 2,
-                        time: "03:00 PM",
-                        title: "Grand Central Terminal & Holiday Fair",
-                        category: "Sightseeing",
-                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
-                        icon: "fa-train",
-                        location: "89 E 42nd St",
-                        duration: "2 hours",
-                        notes: "Explore the majestic concourse and indoor holiday market.",
-                        image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Grand+Central+Terminal+New+York"
-                    }
-                ]
-            },
-            7: {
-                day: 7,
-                date: "Friday, Dec 18, 2026",
-                title: "Hotel Move to DoubleTree & Hudson Yards",
-                subtitle: "Transition to hotel part 2 and visit the Vessel and High Line.",
-                mapQuery: "The Gregorian Hotel to DoubleTree Times Square South",
-                activities: [
-                    {
-                        num: 1,
-                        time: "11:00 AM",
-                        title: "Check-out Gregorian & Check-in DoubleTree 8th Ave",
-                        category: "Hotel",
-                        categoryClass: "bg-emerald-50 text-emerald-700 border-emerald-200",
-                        icon: "fa-suitcase-rolling",
-                        location: "From 35th St to 525 8th Ave",
-                        duration: "1 hour",
-                        notes: "Move your luggage to your second accommodation: DoubleTree Times Square South.",
-                        image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=DoubleTree+by+Hilton+New+York+Times+Square+South"
-                    },
-                    {
-                        num: 2,
-                        time: "02:00 PM",
-                        title: "Hudson Yards & The Vessel",
-                        category: "Sightseeing",
-                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
-                        icon: "fa-building",
-                        location: "Hudson Yards, West Side",
-                        duration: "2.5 hours",
-                        notes: "Explore modern architecture, indoor shopping mall, and the High Line park.",
-                        image: "https://images.unsplash.com/photo-1534430480872-3498386e7856?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Hudson+Yards+New+York"
-                    }
-                ]
-            },
-            8: {
-                day: 8,
-                date: "Saturday, Dec 19, 2026",
-                title: "Broadway Show & Times Square Evening",
-                subtitle: "Experience the vibrant energy of Broadway theater district.",
-                mapQuery: "Broadway Theater District New York",
-                activities: [
-                    {
-                        num: 1,
-                        time: "01:00 PM",
-                        title: "Matinee Broadway Show",
-                        category: "Entertainment",
-                        categoryClass: "bg-purple-50 text-purple-700 border-purple-200",
-                        icon: "fa-masks-theater",
-                        location: "Broadway Theater District",
-                        duration: "3 hours",
-                        notes: "Enjoy a world-famous musical or play in the heart of Broadway.",
-                        image: "https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Broadway+Theatre+New+York"
-                    },
-                    {
-                        num: 2,
-                        time: "06:00 PM",
-                        title: "Times Square Neon Lights & Dinner",
-                        category: "Food",
-                        categoryClass: "bg-rose-50 text-rose-700 border-rose-200",
-                        icon: "fa-utensils",
-                        location: "Times Square",
-                        duration: "3 hours",
-                        notes: "Dine near Times Square and soak in the dazzling mega-screens.",
-                        image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Times+Square+New+York"
-                    }
-                ]
-            },
-            9: {
-                day: 9,
-                date: "Sunday, Dec 20, 2026",
-                title: "Chelsea Market & Greenwich Village",
-                subtitle: "Artisan food halls and historic bohemian neighborhoods.",
-                mapQuery: "Chelsea Market to Washington Square Park New York",
-                activities: [
-                    {
-                        num: 1,
-                        time: "10:30 AM",
-                        title: "Chelsea Market Brunch & Shopping",
-                        category: "Food",
-                        categoryClass: "bg-rose-50 text-rose-700 border-rose-200",
-                        icon: "fa-utensils",
-                        location: "75 9th Ave",
-                        duration: "2.5 hours",
-                        notes: "Sample gourmet treats and fresh pastries inside the historic factory market.",
-                        image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Chelsea+Market+New+York"
-                    },
-                    {
-                        num: 2,
-                        time: "02:00 PM",
-                        title: "Greenwich Village & Washington Square Park",
-                        category: "Sightseeing",
-                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
-                        icon: "fa-shoe-prints",
-                        location: "Greenwich Village",
-                        duration: "2.5 hours",
-                        notes: "Wander charming brownstone streets and historic Washington Square Arch.",
-                        image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Washington+Square+Park+New+York"
-                    }
-                ]
-            },
-            10: {
-                day: 10,
-                date: "Monday, Dec 21, 2026",
-                title: "One World Observatory & Brooklyn Bridge",
-                subtitle: "Stunning downtown views and historic bridge walk.",
-                mapQuery: "One World Trade Center to Brooklyn Bridge",
-                activities: [
-                    {
-                        num: 1,
-                        time: "10:00 AM",
-                        title: "One World Observatory",
-                        category: "Sightseeing",
-                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
-                        icon: "fa-eye",
-                        location: "One World Trade Center",
-                        duration: "2.5 hours",
-                        notes: "Experience the highest observation deck in the Western Hemisphere.",
-                        image: "https://images.unsplash.com/photo-1534430480872-3498386e7856?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=One+World+Observatory+New+York"
-                    },
-                    {
-                        num: 2,
-                        time: "02:30 PM",
-                        title: "Brooklyn Bridge Walk & DUMBO",
-                        category: "Sightseeing",
-                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
-                        icon: "fa-bridge",
-                        location: "Brooklyn Bridge to DUMBO",
-                        duration: "2.5 hours",
-                        notes: "Walk across the iconic bridge for classic NYC skyline photos.",
-                        image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Brooklyn+Bridge+New+York"
-                    }
-                ]
-            },
-            11: {
-                day: 11,
-                date: "Tuesday, Dec 22, 2026",
-                title: "SoHo Shopping & Dyker Heights Lights",
-                subtitle: "Explore famous Brooklyn holiday lighting spectacle.",
-                mapQuery: "SoHo New York to Dyker Heights Brooklyn",
-                activities: [
-                    {
-                        num: 1,
-                        time: "11:00 AM",
-                        title: "SoHo Shopping & Boutiques",
-                        category: "Sightseeing",
-                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
-                        icon: "fa-bag-shopping",
-                        location: "SoHo, Manhattan",
-                        duration: "3 hours",
-                        notes: "Browse cobblestone streets, designer boutiques, and cast-iron architecture.",
-                        image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=SoHo+New+York"
-                    },
-                    {
-                        num: 2,
-                        time: "06:00 PM",
-                        title: "Dyker Heights Christmas Lights Tour",
-                        category: "Sightseeing",
-                        categoryClass: "bg-amber-50 text-amber-700 border-amber-200",
-                        icon: "fa-lightbulb",
-                        location: "Dyker Heights, Brooklyn",
-                        duration: "3 hours",
-                        notes: "Witness the legendary over-the-top residential holiday light displays in Brooklyn.",
-                        image: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Dyker+Heights+Brooklyn+New+York"
-                    }
-                ]
-            },
-            12: {
-                day: 12,
-                date: "Wednesday, Dec 23, 2026",
-                title: "Final Stroll & Return Flight BW525 (JFK &rarr; POS)",
-                subtitle: "Check out and head to JFK for your afternoon flight home to Trinidad.",
-                mapQuery: "DoubleTree Times Square South to JFK Airport Terminal 4",
-                activities: [
-                    {
-                        num: 1,
-                        time: "10:00 AM",
-                        title: "Final Coffee & Souvenir Shopping",
-                        category: "Food",
-                        categoryClass: "bg-rose-50 text-rose-700 border-rose-200",
-                        icon: "fa-mug-hot",
-                        location: "Near Times Square / DoubleTree",
-                        duration: "2 hours",
-                        notes: "Pack your bags, check out of DoubleTree, and grab a farewell NYC coffee.",
-                        image: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=DoubleTree+by+Hilton+New+York+Times+Square+South"
-                    },
-                    {
-                        num: 2,
-                        time: "12:00 PM",
-                        title: "Transfer to JFK Airport Terminal 4",
-                        category: "Transport",
-                        categoryClass: "bg-blue-50 text-blue-700 border-blue-200",
-                        icon: "fa-taxi",
-                        location: "Manhattan to JFK Airport",
-                        duration: "1 hour",
-                        notes: "Take a taxi or transit to JFK Terminal 4 for your return flight.",
-                        image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/dir/?api=1&destination=John+F.+Kennedy+International+Airport+Terminal+4"
-                    },
-                    {
-                        num: 3,
-                        time: "03:20 PM",
-                        title: "Flight Departure: BW525 (JFK &rarr; POS)",
-                        category: "Transport",
-                        categoryClass: "bg-blue-50 text-blue-700 border-blue-200",
-                        icon: "fa-plane-departure",
-                        location: "JFK Airport Terminal 4",
-                        duration: "6 hours flight",
-                        notes: "Board Caribbean Airlines flight BW525 heading back to Piarco International Airport.",
-                        image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=John+F.+Kennedy+International+Airport"
-                    },
-                    {
-                        num: 4,
-                        time: "09:20 PM",
-                        title: "Arrival in Trinidad (POS)",
-                        category: "Transport",
-                        categoryClass: "bg-emerald-50 text-emerald-700 border-emerald-200",
-                        icon: "fa-house-chimney",
-                        location: "Piarco International Airport (POS)",
-                        duration: "Trip Complete",
-                        notes: "Arrive safely back home with wonderful memories of your New York holiday trip!",
-                        image: "https://images.unsplash.com/photo-1534430480872-3498386e7856?auto=format&fit=crop&w=600&q=80",
-                        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Piarco+International+Airport"
-                    }
-                ]
-            }
-        };
-
-        // Packing Checklist State
-        let packingItems = [
-            { id: 1, text: "Passports & Flight Confirmations (BW520/BW525)", packed: true },
-            { id: 2, text: "Heavy Winter Coat / Parka", packed: true },
-            { id: 3, text: "Thermal Underwear & Base Layers", packed: true },
-            { id: 4, text: "Waterproof Winter Boots with Good Grip", packed: true },
-            { id: 5, text: "Warm Scarves, Beanies, & Touchscreen Gloves", packed: true },
-            { id: 6, text: "Power Bank & US Wall Adapters", packed: true },
-            { id: 7, text: "MetroCard / Contactless Credit Card for Subway", packed: true },
-            { id: 8, text: "Hotel Confirmation Vouchers (Gregorian & DoubleTree)", packed: true },
-            { id: 9, text: "Camera & Extra SD Cards / Charger", packed: true },
-            { id: 10, text: "Prescription Medications & First Aid", packed: true },
-            { id: 11, text: "Compact Travel Umbrella", packed: false },
-            { id: 12, text: "Lip Balm & Moisturizer (for dry winter air)", packed: true },
-            { id: 13, text: "Daypack for daily city walks", packed: true },
-            { id: 14, text: "Sunglasses (for snowy glare)", packed: false },
-            { id: 15, text: "Hand Warmers (HotHands)", packed: false },
-            { id: 16, text: "Broadway Tickets / Reservation Printouts", packed: true },
-            { id: 17, text: "Reusable Water Bottle", packed: true }
-        ];
-
+        let itineraryData = {};
+        let packingItems = [];
         let currentActiveDay = 1;
         let routeMap;
         const geocodeCache = new Map();
@@ -843,37 +297,15 @@
         let deferredInstallPrompt;
         const planningStorageKey = 'nyc-trip-planning-v1';
         const eventStorageKey = 'nyc-trip-events-v1';
-        const planningHours = Array.from({ length: 24 }, (_, hour) => hour);
 
-        let tripPlan = {
-            trip: { name: 'New York Holiday Escape', startDate: '2026-12-12', endDate: '2026-12-23' },
-            confirmed: {
-                hotels: [
-                    { name: 'The Gregorian Hotel', from: '2026-12-12', to: '2026-12-18' },
-                    { name: 'DoubleTree Times Square South', from: '2026-12-18', to: '2026-12-23' }
-                ],
-                flights: [
-                    { flight: 'BW520', from: 'POS', to: 'JFK', departure: '2026-12-12T00:10', arrival: '2026-12-12T04:30' },
-                    { flight: 'BW525', from: 'JFK', to: 'POS', departure: '2026-12-23T15:20', arrival: '2026-12-23T21:20' }
-                ]
-            },
-            days: {}
-        };
-
-        const confirmedEvents = {
-            1: [
-                { from: '00:10', to: '04:30', title: 'Confirmed flight BW520: POS to JFK', detail: 'Caribbean Airlines' },
-                { from: '15:00', to: '16:00', title: 'Confirmed hotel check-in', detail: 'The Gregorian Hotel' }
-            ],
-            12: [
-                { from: '15:20', to: '21:20', title: 'Confirmed flight BW525: JFK to POS', detail: 'Caribbean Airlines' }
-            ]
-        };
+        let tripPlan = { trip: {}, confirmed: {}, days: {} };
+        const confirmedEvents = {};
 
         function getHotelForDay(dayNum) {
-            const hotel = tripPlan.confirmed.hotels?.find(stay => dayNum <= 6
-                ? stay.name.includes('Gregorian')
-                : stay.name.includes('DoubleTree'));
+            const startDate = new Date(`${tripPlan.trip.startDate}T00:00:00`);
+            startDate.setDate(startDate.getDate() + dayNum - 1);
+            const date = startDate.toISOString().slice(0, 10);
+            const hotel = tripPlan.confirmed.hotels?.find(stay => date >= stay.from && date <= stay.to);
             return hotel ? `${hotel.name} (confirmed)` : 'No hotel recorded';
         }
 
@@ -890,7 +322,9 @@
             try {
                 const storedEvents = JSON.parse(localStorage.getItem(eventStorageKey) || '{}');
                 Object.entries(storedEvents).forEach(([dayNum, events]) => {
-                    confirmedEvents[dayNum] = [...(confirmedEvents[dayNum] || []), ...events];
+                    const existingEvents = confirmedEvents[dayNum] || [];
+                    const newEvents = events.filter(event => !existingEvents.some(existing => existing.id && existing.id === event.id));
+                    confirmedEvents[dayNum] = [...existingEvents, ...newEvents];
                 });
             } catch (error) {
                 console.error('Unable to load saved events', error);
@@ -915,6 +349,82 @@
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#039;');
+        }
+
+        function formatDate(dateString, options = {}) {
+            if (!dateString) return '';
+            return new Intl.DateTimeFormat(undefined, options).format(new Date(`${dateString}T00:00:00`));
+        }
+
+        function formatFlightDateTime(dateTime) {
+            if (!dateTime) return '';
+            return new Intl.DateTimeFormat(undefined, {
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            }).format(new Date(dateTime));
+        }
+
+        function renderDashboard() {
+            const flights = tripPlan.confirmed.flights || [];
+            const hotels = tripPlan.confirmed.hotels || [];
+            const itineraryDays = Object.keys(itineraryData).length;
+            const nights = Math.max(0, itineraryDays - 1);
+            const flightNames = flights.map(flight => `${flight.flight}: ${flight.from} → ${flight.to}`).join(' · ');
+
+            document.getElementById('header-trip-label').textContent = flightNames;
+            document.getElementById('header-trip-name').textContent = tripPlan.trip.name || '';
+            document.getElementById('trip-date-range').textContent = `${formatDate(tripPlan.trip.startDate, { month: 'short', day: 'numeric' })} - ${formatDate(tripPlan.trip.endDate, { month: 'short', day: 'numeric', year: 'numeric' })}`;
+            document.getElementById('flight-status').textContent = flights.length ? `${flights.length} flight${flights.length === 1 ? '' : 's'} confirmed` : 'No flights recorded';
+            document.getElementById('trip-title').textContent = tripPlan.title || tripPlan.trip.name || '';
+            document.getElementById('trip-subtitle').textContent = tripPlan.subtitle || '';
+            document.getElementById('trip-duration').textContent = `${itineraryDays} Days / ${nights} Nights`;
+            document.getElementById('trip-flights').textContent = flightNames;
+            document.getElementById('trip-hotels').textContent = hotels.map(hotel => hotel.name).join(' → ');
+            document.getElementById('trip-weather').textContent = tripPlan.weather || '';
+            document.getElementById('hero-image').src = tripPlan.heroImage || '';
+            document.getElementById('hero-image').alt = tripPlan.title || tripPlan.trip.name || '';
+            document.getElementById('footer-text').textContent = `${tripPlan.trip.name || ''} · ${flightNames}`;
+
+            document.getElementById('flight-summary').innerHTML = `
+                <h3 class="font-bold text-slate-900 text-base mb-4 flex items-center space-x-2">
+                    <i class="fa-solid fa-plane text-brand-500"></i>
+                    <span>Flight Information</span>
+                </h3>
+                <div class="space-y-3 text-sm">
+                    ${flights.map(flight => `
+                        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                            <span class="text-xs font-bold text-brand-600 uppercase">${escapeHtml(flight.flight || 'Flight')}</span>
+                            <div class="font-bold text-slate-900 mt-1">${escapeHtml(flight.from)} → ${escapeHtml(flight.to)}</div>
+                            <div class="text-xs text-slate-500 mt-0.5">${escapeHtml(formatFlightDateTime(flight.departure))} - ${escapeHtml(formatFlightDateTime(flight.arrival))}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            document.getElementById('accommodation-summary').innerHTML = `
+                <h3 class="font-bold text-slate-900 text-base mb-4 flex items-center space-x-2">
+                    <i class="fa-solid fa-hotel text-brand-500"></i>
+                    <span>Accommodation</span>
+                </h3>
+                <div class="space-y-3 text-sm">
+                    ${hotels.map(hotel => `
+                        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                            <div class="font-bold text-slate-900">${escapeHtml(hotel.name)}</div>
+                            <div class="text-xs text-slate-500 mt-0.5">${escapeHtml(hotel.address || '')}</div>
+                            <div class="text-xs text-emerald-600 mt-1">${escapeHtml(hotel.from)} - ${escapeHtml(hotel.to)}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            document.getElementById('day-selector').innerHTML = Object.entries(itineraryData)
+                .sort(([a], [b]) => Number(a) - Number(b))
+                .map(([dayNum, day]) => `
+                    <button onclick="switchDay(${Number(dayNum)})" id="tab-${Number(dayNum)}" class="day-tab flex-shrink-0 px-4 py-2.5 rounded-xl font-semibold text-sm transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                        Day ${escapeHtml(day.day || dayNum)}: ${escapeHtml(day.date || '')}
+                    </button>
+                `).join('');
         }
 
         let selectedEventLocation = null;
@@ -1031,37 +541,29 @@
 
         async function loadTripPlan() {
             const url = window.TRIP_PLAN_URL;
-            if (!url) return;
+            if (!url) throw new Error('TRIP_PLAN_URL is not configured.');
 
             try {
                 const response = await fetch(url, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`Trip plan request failed with status ${response.status}`);
                 const payload = await response.json();
                 const remotePlan = payload.record || payload;
+                itineraryData = remotePlan.itinerary || {};
+                packingItems = remotePlan.packingItems || [];
                 tripPlan = {
-                    ...tripPlan,
                     ...remotePlan,
-                    confirmed: { ...tripPlan.confirmed, ...remotePlan.confirmed },
+                    trip: remotePlan.trip || {},
+                    confirmed: remotePlan.confirmed || {},
                     days: remotePlan.days || {}
                 };
+                Object.entries(remotePlan.events || {}).forEach(([dayNum, events]) => {
+                    confirmedEvents[dayNum] = events;
+                });
+
                 localStorage.setItem(
                     planningStorageKey,
                     JSON.stringify(Object.values(tripPlan.days).reduce((all, day) => ({ ...all, ...(day.planning || {}) }), {}))
                 );
-                const customDayOneEvents = (confirmedEvents[1] || []).filter(event => event.id);
-                const customDayTwelveEvents = (confirmedEvents[12] || []).filter(event => event.id);
-                confirmedEvents[1] = tripPlan.confirmed.flights?.[0] ? [{
-                    from: tripPlan.confirmed.flights[0].departure.slice(11, 16),
-                    to: tripPlan.confirmed.flights[0].arrival.slice(11, 16),
-                    title: `Confirmed flight ${tripPlan.confirmed.flights[0].flight}: ${tripPlan.confirmed.flights[0].from} to ${tripPlan.confirmed.flights[0].to}`,
-                    detail: 'Caribbean Airlines'
-                }, ...customDayOneEvents] : customDayOneEvents;
-                confirmedEvents[12] = tripPlan.confirmed.flights?.[1] ? [{
-                    from: tripPlan.confirmed.flights[1].departure.slice(11, 16),
-                    to: tripPlan.confirmed.flights[1].arrival.slice(11, 16),
-                    title: `Confirmed flight ${tripPlan.confirmed.flights[1].flight}: ${tripPlan.confirmed.flights[1].from} to ${tripPlan.confirmed.flights[1].to}`,
-                    detail: 'Caribbean Airlines'
-                }, ...customDayTwelveEvents] : customDayTwelveEvents;
                 Object.entries(tripPlan.days).forEach(([dayNum, day]) => {
                     if (day.events?.length) {
                         const existingEvents = confirmedEvents[dayNum] || [];
@@ -1070,7 +572,8 @@
                     }
                 });
             } catch (error) {
-                console.error('Using local trip plan fallback', error);
+                console.error('Unable to load trip data', error);
+                throw error;
             }
         }
 
@@ -1171,7 +674,7 @@
                             <div class="text-xs font-bold text-slate-500 pt-2">${start}<br><span class="font-normal">to ${end}</span></div>
                             <div class="rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2 text-sm">
                                 <strong class="text-emerald-800">${escapeHtml(event.title)}</strong>
-                                <span class="block text-xs text-emerald-700">${escapeHtml(event.detail || event.location || '')} · ${event.from}–${event.to}</span>
+                                <span class="block text-xs text-emerald-700">${escapeHtml(event.detail || event.location || '')} Ã‚Â· ${event.from}Ã¢â‚¬â€œ${event.to}</span>
                                 ${event.location ? `<span class="block text-xs text-emerald-700 mt-1"><i class="fa-solid fa-location-dot mr-1"></i>${escapeHtml(event.location)}</span>` : ''}
                             </div>
                         </div>
@@ -1367,7 +870,7 @@
                     routeMap.fitBounds(L.latLngBounds(route.coordinates), { padding: [24, 24] });
                     const distance = route.distance ? `${route.distance.toFixed(1)} km` : 'distance unavailable';
                     const duration = route.duration ? `${Math.round(route.duration / 60)} min walk` : 'walking time unavailable';
-                    mapStatus.innerText = `${mappedLocations.length} stops routed along walkable paths · ${distance} · ${duration}.`;
+                    mapStatus.innerText = `${mappedLocations.length} stops routed along walkable paths Ã‚Â· ${distance} Ã‚Â· ${duration}.`;
                 } else {
                     routeMap.setView(routePoints[0], 16);
                     mapStatus.innerText = 'One itinerary location found; no route is needed.';
@@ -1429,7 +932,7 @@
                         </div>
                         <div class="rounded-2xl bg-amber-50 border border-amber-200 p-3">
                             <span class="block text-xs font-bold uppercase text-amber-700">Planning status</span>
-                            <strong class="text-sm text-amber-900">Open — ${openTimeLabel} to account for</strong>
+                            <strong class="text-sm text-amber-900">Open Ã¢â‚¬â€ ${openTimeLabel} to account for</strong>
                         </div>
                     </div>
                     <div class="rounded-2xl border border-slate-200 px-3 sm:px-5">
@@ -1506,10 +1009,24 @@
         }
 
         window.onload = async function() {
-            loadStoredEvents();
-            await loadTripPlan();
-            switchDay(1);
-            renderChecklist();
+            try {
+                await loadTripPlan();
+                loadStoredEvents();
+                const firstDay = Number(Object.keys(itineraryData)[0]);
+                if (!firstDay) throw new Error('Trip data does not contain any itinerary days.');
+                renderDashboard();
+                currentActiveDay = firstDay;
+                switchDay(firstDay);
+                renderChecklist();
+            } catch (error) {
+                document.getElementById('itinerary-content').innerHTML = `
+                    <div class="rounded-3xl bg-red-50 border border-red-200 p-6 text-red-800">
+                        <h2 class="font-bold">Trip data could not be loaded</h2>
+                        <p class="text-sm mt-1">Check the JSONBin configuration and reload the page.</p>
+                    </div>
+                `;
+                return;
+            }
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
                     .then(registration => registration.update())

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nyc-planner-v2';
+const CACHE_NAME = 'nyc-planner-v4';
 const APP_SHELL = [
   './',
   './index.html',

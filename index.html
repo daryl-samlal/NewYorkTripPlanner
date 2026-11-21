@@ -913,24 +913,47 @@
             const state = getPlanningState();
             const dayEvents = confirmedEvents[dayNum] || [];
             
-            function isHourBlocked(hour) {
-                const hourStr = String(hour).padStart(2, '0');
-                return dayEvents.some(event => {
-                    const [startHour] = event.from.split(':').map(Number);
-                    const [endHour] = event.to.split(':').map(Number);
-                    const currentHour = hour;
-                    return currentHour >= startHour && currentHour < endHour;
-                });
+            function getEventBlockingInfo(hour) {
+                const hourStart = hour;
+                const hourEnd = hour + 1;
+                
+                for (const event of dayEvents) {
+                    const [eventStartHour, eventStartMin] = event.from.split(':').map(Number);
+                    const [eventEndHour, eventEndMin] = event.to.split(':').map(Number);
+                    
+                    const eventStartTime = eventStartHour + eventStartMin / 60;
+                    const eventEndTime = eventEndHour + eventEndMin / 60;
+                    
+                    if (eventStartTime < hourEnd && eventEndTime > hourStart) {
+                        const isFullyBlocked = eventStartTime <= hourStart && eventEndTime >= hourEnd;
+                        const partialEndTime = eventEndTime > hourStart && eventEndTime < hourEnd ? eventEndTime : null;
+                        
+                        return { isBlocked: true, isFullyBlocked, partialEndTime };
+                    }
+                }
+                return { isBlocked: false };
             }
             
             return planningHours.map(hour => {
-                if (isHourBlocked(hour)) return '';
+                const blockingInfo = getEventBlockingInfo(hour);
+                
+                if (blockingInfo.isFullyBlocked) return '';
                 
                 const slot = state[`${dayNum}-${hour}`] || {};
                 const confirmed = dayEvents.find(event => event.from.startsWith(String(hour).padStart(2, '0') + ':'));
+                
+                let start, end;
+                if (blockingInfo.partialEndTime) {
+                    const partialHour = Math.floor(blockingInfo.partialEndTime);
+                    const partialMin = Math.round((blockingInfo.partialEndTime - partialHour) * 60);
+                    start = `${String(partialHour).padStart(2, '0')}:${String(partialMin).padStart(2, '0')}`;
+                } else {
+                    start = `${String(hour).padStart(2, '0')}:00`;
+                }
+                
                 const nextHour = String((hour + 1) % 24).padStart(2, '0');
-                const start = `${String(hour).padStart(2, '0')}:00`;
-                const end = `${nextHour}:00`;
+                end = `${nextHour}:00`;
+                
                 return `
                     <div class="grid grid-cols-[4.5rem_1fr] sm:grid-cols-[6rem_1fr] gap-3 items-start border-b border-slate-100 py-3 last:border-0">
                         <div class="text-xs font-bold text-slate-500 pt-2">${start}<br><span class="font-normal">to ${end}</span></div>
@@ -1247,7 +1270,9 @@
             switchDay(1);
             renderChecklist();
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./sw.js').catch(error => console.error('PWA setup failed', error));
+                navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+                    .then(registration => registration.update())
+                    .catch(error => console.error('PWA setup failed', error));
             }
         }
 

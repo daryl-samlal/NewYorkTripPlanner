@@ -66,30 +66,30 @@
 
     <!-- Top Navigation Bar -->
     <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-0 sm:h-16 flex flex-wrap items-center gap-3">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-0 sm:h-16 flex flex-wrap items-center gap-2 sm:gap-3">
             <div class="flex items-center space-x-3 min-w-0 flex-1">
-                <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-brand-500/20">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 flex-shrink-0 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold text-base sm:text-lg shadow-md shadow-brand-500/20">
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div class="min-w-0">
-                    <span class="text-[10px] sm:text-xs uppercase tracking-wider text-slate-400 font-semibold block truncate">Caribbean Airlines BW520 &rarr; BW525</span>
+                    <span class="hidden sm:block text-xs uppercase tracking-wider text-slate-400 font-semibold truncate">Caribbean Airlines BW520 &rarr; BW525</span>
                     <h1 class="text-sm sm:text-base font-bold text-slate-900 leading-tight truncate">New York Holiday Escape</h1>
                 </div>
             </div>
-            <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
-                <button onclick="openTab('itinerary')" id="nav-btn-itinerary" class="flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-brand-500 text-white px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95 shadow-sm">
+            <div class="flex items-center justify-between sm:justify-end gap-1.5 sm:gap-2 w-full sm:w-auto">
+                <button onclick="openTab('itinerary')" id="nav-btn-itinerary" class="flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-brand-500 text-white px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-sm font-medium transition active:scale-95 shadow-sm">
                     <i class="fa-solid fa-calendar-days"></i>
                     <span class="hidden sm:inline">Itinerary</span>
                 </button>
-                <button onclick="openTab('mapview')" id="nav-btn-mapview" class="flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95">
+                <button onclick="openTab('mapview')" id="nav-btn-mapview" class="flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-sm font-medium transition active:scale-95">
                     <i class="fa-solid fa-map-location-dot text-brand-500"></i>
                     <span class="hidden sm:inline">Live Map</span>
                 </button>
-                <button onclick="openPackingModal()" class="flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95">
+                <button onclick="openPackingModal()" class="flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-sm font-medium transition active:scale-95">
                     <i class="fa-solid fa-suitcase-rolling text-brand-500"></i>
                     <span id="packingCountBadge" class="bg-brand-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">14/17</span>
                 </button>
-                <button onclick="installPWA()" id="install-app-btn" class="hidden flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95">
+                <button onclick="installPWA()" id="install-app-btn" class="hidden flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-sm font-medium transition active:scale-95">
                     <i class="fa-solid fa-download text-brand-500"></i>
                     <span class="hidden sm:inline">Install App</span>
                 </button>

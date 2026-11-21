@@ -248,13 +248,14 @@
                     <div>
                         <span class="text-brand-600 text-xs font-bold uppercase tracking-wider block mb-1">Google Maps Interactive Route</span>
                         <h3 id="map-title" class="text-2xl font-bold text-slate-900">Day 1 Route & Locations</h3>
-                        <p class="text-slate-500 text-sm mt-1">Numbered pins below update dynamically based on your selected day in the itinerary.</p>
+                        <p class="text-slate-500 text-sm mt-1">Suggested routes and locations update dynamically based on your selected day in the itinerary.</p>
+                        <p id="map-status" class="text-amber-600 text-xs mt-2 hidden"></p>
                     </div>
                 </div>
 
                 <!-- Embedded Google Maps Container -->
                 <div class="relative w-full h-[min(450px,60vh)] min-h-[300px] rounded-2xl overflow-hidden shadow-md border border-slate-200">
-                    <iframe id="google-map-iframe" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps/embed/v1/place?key=&q=Piarco+International+Airport+to+The+Gregorian+Hotel+New+York"></iframe>
+                    <iframe id="google-map-iframe" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Google Maps route for the selected day"></iframe>
                 </div>
             </div>
         </div>
@@ -772,6 +773,8 @@
         ];
 
         let currentActiveDay = 1;
+        // Inject this value at deploy time; do not commit API keys to the repository.
+        const GOOGLE_MAPS_API_KEY = window.GOOGLE_MAPS_API_KEY || '';
 
         // Tab Switching Logic (Itinerary vs Map)
         function openTab(tabName) {
@@ -796,19 +799,42 @@
             }
         }
 
-        // Update Google Maps iframe based on active day
+        // Update Google Maps iframe based on active day.
         function updateGoogleMapEmbed(dayNum) {
             const data = itineraryData[dayNum];
             if (!data) return;
 
             const mapTitle = document.getElementById('map-title');
             const iframe = document.getElementById('google-map-iframe');
+            const mapStatus = document.getElementById('map-status');
             
             if (mapTitle) mapTitle.innerText = `Day ${dayNum}: Route & Map Locations`;
-            if (iframe) {
-                const encodedQuery = encodeURIComponent(data.mapQuery);
-                iframe.src = `https://www.google.com/maps/embed/v1/search?key=&q=${encodedQuery}`;
+            if (!iframe || !mapStatus) return;
+
+            if (!GOOGLE_MAPS_API_KEY) {
+                iframe.removeAttribute('src');
+                mapStatus.innerText = 'Add a restricted Google Maps API key through window.GOOGLE_MAPS_API_KEY to display this route.';
+                mapStatus.classList.remove('hidden');
+                return;
             }
+
+            const locations = data.activities
+                .map(activity => activity.location)
+                .filter(Boolean);
+            const origin = locations[0] || data.mapQuery;
+            const destination = locations[locations.length - 1] || data.mapQuery;
+            const waypoints = locations.slice(1, -1).join('|');
+            const params = new URLSearchParams({
+                key: GOOGLE_MAPS_API_KEY,
+                origin,
+                destination,
+                mode: 'walking'
+            });
+
+            if (waypoints) params.set('waypoints', waypoints);
+
+            iframe.src = `https://www.google.com/maps/embed/v1/directions?${params.toString()}`;
+            mapStatus.classList.add('hidden');
         }
 
         // Render Day Itinerary

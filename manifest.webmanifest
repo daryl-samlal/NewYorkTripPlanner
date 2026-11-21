@@ -1,0 +1,17 @@
+{
+  "name": "New York Holiday Trip Planner",
+  "short_name": "NYC Planner",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#e11d48",
+  "description": "Plan the open hours of your New York holiday.",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

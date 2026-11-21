@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New York Winter Holiday Trip Itinerary (Dec 2026)</title>
+    <meta name="theme-color" content="#e11d48">
+    <link rel="manifest" href="manifest.webmanifest">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts Inter -->
@@ -791,6 +793,62 @@
         let routeMap;
         const geocodeCache = new Map();
         let routeRequestId = 0;
+        const planningStorageKey = 'nyc-trip-planning-v1';
+        const planningHours = Array.from({ length: 24 }, (_, hour) => hour);
+
+        const confirmedEvents = {
+            1: [
+                { from: '00:10', to: '04:30', title: 'Confirmed flight BW520: POS to JFK', detail: 'Caribbean Airlines' },
+                { from: '15:00', to: '16:00', title: 'Confirmed hotel check-in', detail: 'The Gregorian Hotel' }
+            ],
+            12: [
+                { from: '15:20', to: '21:20', title: 'Confirmed flight BW525: JFK to POS', detail: 'Caribbean Airlines' }
+            ]
+        };
+
+        function getHotelForDay(dayNum) {
+            if (dayNum <= 6) return 'The Gregorian Hotel (confirmed)';
+            return 'DoubleTree Times Square South (confirmed)';
+        }
+
+        function getPlanningState() {
+            try {
+                return JSON.parse(localStorage.getItem(planningStorageKey) || '{}');
+            } catch {
+                return {};
+            }
+        }
+
+        function savePlanningSlot(dayNum, hour, field, value) {
+            const state = getPlanningState();
+            state[`${dayNum}-${hour}`] = { ...(state[`${dayNum}-${hour}`] || {}), [field]: value };
+            localStorage.setItem(planningStorageKey, JSON.stringify(state));
+        }
+
+        function renderPlanningGrid(dayNum) {
+            const state = getPlanningState();
+            const dayEvents = confirmedEvents[dayNum] || [];
+            return planningHours.map(hour => {
+                const slot = state[`${dayNum}-${hour}`] || {};
+                const confirmed = dayEvents.find(event => event.from.startsWith(String(hour).padStart(2, '0') + ':'));
+                const nextHour = String((hour + 1) % 24).padStart(2, '0');
+                const start = `${String(hour).padStart(2, '0')}:00`;
+                const end = `${nextHour}:00`;
+                return `
+                    <div class="grid grid-cols-[4.5rem_1fr] sm:grid-cols-[6rem_1fr] gap-3 items-start border-b border-slate-100 py-3 last:border-0">
+                        <div class="text-xs font-bold text-slate-500 pt-2">${start}<br><span class="font-normal">to ${end}</span></div>
+                        <div class="space-y-2">
+                            ${confirmed ? `<div class="rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2 text-sm"><strong class="text-emerald-800">${confirmed.title}</strong><span class="block text-xs text-emerald-700">${confirmed.detail} · ${confirmed.from}–${confirmed.to}</span></div>` : ''}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <input aria-label="From time for ${start}" type="time" value="${slot.from || start}" onchange="savePlanningSlot(${dayNum}, ${hour}, 'from', this.value)" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                                <input aria-label="To time for ${start}" type="time" value="${slot.to || end}" onchange="savePlanningSlot(${dayNum}, ${hour}, 'to', this.value)" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                            </div>
+                            <input aria-label="Plan for ${start}" type="text" value="${slot.plan || ''}" placeholder="Add plan or leave open..." onchange="savePlanningSlot(${dayNum}, ${hour}, 'plan', this.value)" class="w-full text-sm bg-white border border-slate-200 rounded-xl px-3 py-2">
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
 
         // Tab Switching Logic (Itinerary vs Map)
         function openTab(tabName) {
@@ -913,7 +971,7 @@
 
             let routePoints = [];
             try {
-                const locations = await Promise.all(data.activities.map(async activity => ({
+                const locations = await Promise.all([].map(async activity => ({
                     activity,
                     coordinates: await geocodeLocation(activity.location)
                 })));
@@ -988,71 +1046,29 @@
 
             if (!data) return;
 
-            let html = `
-                <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm mb-6">
-                    <div class="border-b border-slate-100 pb-4 mb-6 flex flex-wrap items-center justify-between gap-2">
+            const confirmedCount = (confirmedEvents[dayNum] || []).length;
+            const html = `
+                <div class="bg-white rounded-3xl p-5 sm:p-8 border border-slate-200 shadow-sm mb-6">
+                    <div class="border-b border-slate-100 pb-4 mb-5 flex flex-wrap items-start justify-between gap-3">
                         <div>
                             <span class="text-brand-600 text-xs font-bold uppercase tracking-wider block mb-1">${data.date}</span>
-                            <h3 class="text-xl sm:text-2xl font-bold text-slate-900">${data.title}</h3>
-                            <p class="text-slate-500 text-sm mt-1">${data.subtitle}</p>
+                            <h3 class="text-xl sm:text-2xl font-bold text-slate-900">Day ${data.day}: Open Planning</h3>
+                            <p class="text-slate-500 text-sm mt-1">Only confirmed reservations are shown. Add plans to any open hour.</p>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <button onclick="openTab('mapview')" class="bg-brand-50 hover:bg-brand-100 text-brand-600 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center space-x-1.5 border border-brand-200">
-                                <i class="fa-solid fa-map-location-dot"></i>
-                                <span>View Day ${data.day} on Map</span>
-                            </button>
+                        <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">${confirmedCount} confirmed item${confirmedCount === 1 ? '' : 's'}</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                        <div class="rounded-2xl bg-emerald-50 border border-emerald-200 p-3">
+                            <span class="block text-xs font-bold uppercase text-emerald-700">Confirmed hotel</span>
+                            <strong class="text-sm text-emerald-900">${getHotelForDay(dayNum)}</strong>
+                        </div>
+                        <div class="rounded-2xl bg-amber-50 border border-amber-200 p-3">
+                            <span class="block text-xs font-bold uppercase text-amber-700">Planning status</span>
+                            <strong class="text-sm text-amber-900">Open — ${24 - confirmedCount} hours to account for</strong>
                         </div>
                     </div>
-
-                    <div class="space-y-6 relative before:absolute before:inset-0 before:left-4 before:w-0.5 before:bg-slate-100">
-            `;
-
-            data.activities.forEach((act) => {
-                html += `
-                    <div class="relative flex items-start space-x-4 sm:space-x-6 group">
-                        <div class="relative z-10 w-8 h-8 rounded-full bg-brand-500 text-white border-2 border-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-md">
-                            ${act.num}
-                        </div>
-                        <div class="flex-grow bg-slate-50/70 hover:bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 transition shadow-xs hover:shadow-md">
-                            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                                <span class="inline-flex items-center space-x-1.5 text-xs font-bold text-slate-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
-                                    <i class="fa-regular fa-clock text-brand-500"></i>
-                                    <span>${act.time}</span>
-                                </span>
-                                <span class="text-xs font-semibold px-2.5 py-1 rounded-full border ${act.categoryClass}">
-                                    ${act.category}
-                                </span>
-                            </div>
-
-                            <h4 class="text-base sm:text-lg font-bold text-slate-900 mb-1">${act.title}</h4>
-                            <p class="text-slate-500 text-xs sm:text-sm flex items-center space-x-1 mb-3">
-                                <i class="fa-solid fa-location-dot text-rose-500"></i>
-                                <span>${act.location}</span>
-                            </p>
-
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3 pt-3 border-t border-slate-200/60 items-center">
-                                <div class="md:col-span-2">
-                                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">${act.notes}</p>
-                                    <div class="flex flex-wrap items-center gap-3 mt-3">
-                                        <span class="text-xs font-medium text-slate-400">
-                                            <i class="fa-regular fa-hourglass-half mr-1"></i> Duration: ${act.duration}
-                                        </span>
-                                        <a href="${act.mapsUrl}" target="_blank" class="inline-flex items-center space-x-1.5 bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition shadow-xs">
-                                            <i class="fa-solid fa-diamond-turn-right"></i>
-                                            <span>Get Directions</span>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="overflow-hidden rounded-xl h-24 md:h-20 shadow-xs border border-slate-200">
-                                    <img src="${act.image}" alt="${act.title}" class="w-full h-full object-cover transform hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/400x200/e2e8f0/64748b?text=New+York'">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            html += `
+                    <div class="rounded-2xl border border-slate-200 px-3 sm:px-5">
+                        ${renderPlanningGrid(dayNum)}
                     </div>
                 </div>
             `;
@@ -1127,6 +1143,9 @@
         window.onload = function() {
             switchDay(1);
             renderChecklist();
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js').catch(error => console.error('PWA setup failed', error));
+            }
         }
     </script>
 </body>

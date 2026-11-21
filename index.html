@@ -40,6 +40,20 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         #map { height: 420px; width: 100%; border-radius: 1.5rem; z-index: 10; }
+        .numbered-marker {
+            width: 2rem;
+            height: 2rem;
+            border: 3px solid #fff;
+            border-radius: 9999px;
+            background: #e11d48;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            box-shadow: 0 3px 8px rgb(15 23 42 / 35%);
+        }
         @media (max-width: 639px) {
             .custom-scrollbar::-webkit-scrollbar { height: 4px; }
             #toast { right: 0.75rem; bottom: 0.75rem; max-width: calc(100vw - 1.5rem); }
@@ -785,16 +799,19 @@
             const btnItin = document.getElementById('nav-btn-itinerary');
             const btnMap = document.getElementById('nav-btn-mapview');
 
+            const activeClasses = "flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-brand-500 text-white px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95 shadow-sm";
+            const inactiveClasses = "flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95";
+
             if (tabName === 'itinerary') {
                 itinView.classList.remove('hidden');
                 mapView.classList.add('hidden');
-                btnItin.className = "inline-flex items-center space-x-2 bg-brand-500 text-white px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95 shadow-sm";
-                btnMap.className = "inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95";
+                btnItin.className = activeClasses;
+                btnMap.className = inactiveClasses;
             } else {
                 itinView.classList.add('hidden');
                 mapView.classList.remove('hidden');
-                btnMap.className = "inline-flex items-center space-x-2 bg-brand-500 text-white px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95 shadow-sm";
-                btnItin.className = "inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95";
+                btnMap.className = activeClasses;
+                btnItin.className = inactiveClasses;
                 
                 updateOpenStreetMap(currentActiveDay);
                 setTimeout(() => routeMap?.invalidateSize(), 0);
@@ -805,8 +822,9 @@
             if (routeMap || !window.L) return;
 
             routeMap = L.map('route-map').setView([40.758, -73.985], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors',
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                subdomains: 'abcd',
                 maxZoom: 19
             }).addTo(routeMap);
         }
@@ -908,7 +926,15 @@
 
                 routePoints = mappedLocations.map(location => location.coordinates);
                 mappedLocations.forEach(({ activity, coordinates }) => {
-                    L.marker(coordinates)
+                    L.marker(coordinates, {
+                        icon: L.divIcon({
+                            className: '',
+                            html: `<span class="numbered-marker">${activity.num}</span>`,
+                            iconSize: [32, 32],
+                            iconAnchor: [16, 16],
+                            popupAnchor: [0, -16]
+                        })
+                    })
                         .addTo(routeMap)
                         .bindPopup(`<strong>${activity.num}. ${activity.title}</strong><br>${activity.location}`);
                 });

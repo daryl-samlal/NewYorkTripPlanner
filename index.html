@@ -81,6 +81,10 @@
                     <i class="fa-solid fa-calendar-days"></i>
                     <span class="hidden sm:inline">Itinerary</span>
                 </button>
+                <button onclick="openTab('transports')" id="nav-btn-transports" class="flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-sm font-medium transition active:scale-95">
+                    <i class="fa-solid fa-shuttle-van text-brand-500"></i>
+                    <span class="hidden sm:inline">Transports</span>
+                </button>
                 <button onclick="openTab('mapview')" id="nav-btn-mapview" class="flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-sm font-medium transition active:scale-95">
                     <i class="fa-solid fa-map-location-dot text-brand-500"></i>
                     <span class="hidden sm:inline">Live Map</span>
@@ -101,47 +105,47 @@
     <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8">
         
         <!-- Hero Trip Dashboard Card -->
-        <div class="relative rounded-3xl overflow-hidden shadow-xl bg-slate-900 text-white mb-8 sm:mb-10">
+        <div class="relative rounded-3xl overflow-hidden shadow-xl bg-slate-900 text-white mb-6 sm:mb-8">
             <!-- Background Image with Overlay -->
             <div class="absolute inset-0 z-0">
-                <img id="hero-image" src="" alt="" class="w-full h-full object-cover opacity-40 transform hover:scale-105 transition duration-1000">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent"></div>
+                <img id="hero-image" src="" alt="" class="w-full h-full object-cover opacity-55 transform hover:scale-105 transition duration-1000">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/50 to-transparent"></div>
             </div>
 
             <!-- Dashboard Content -->
-            <div class="relative z-10 p-5 sm:p-10 lg:p-12 flex flex-col justify-between">
-                <div class="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-                    <span class="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-medium tracking-wide text-white border border-white/10">
+            <div class="relative z-10 p-4 sm:p-6 lg:p-8 flex flex-col justify-between min-h-80">
+                <div class="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+                    <span class="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium tracking-wide text-white border border-white/10">
                         <i class="fa-regular fa-calendar-days text-brand-400"></i>
                         <span id="trip-date-range"></span>
                     </span>
-                    <div id="flight-status-pill" class="flex items-center space-x-2 text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-full">
+                    <div id="flight-status-pill" class="flex items-center space-x-2 text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full">
                         <i class="fa-solid fa-circle text-[8px] animate-pulse"></i>
                         <span id="flight-status"></span>
                     </div>
                 </div>
 
-                <div class="mt-8">
-                    <h2 id="trip-title" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-3"></h2>
-                    <p id="trip-subtitle" class="text-slate-300 text-sm sm:text-base max-w-2xl font-normal leading-relaxed"></p>
+                <div class="mt-4">
+                    <h2 id="trip-title" class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white mb-2"></h2>
+                    <p id="trip-subtitle" class="text-slate-300 text-xs sm:text-sm max-w-2xl font-normal leading-relaxed"></p>
 
                     <!-- Quick Stats Grid -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-white/10">
-                        <div class="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10">
-                            <span class="text-slate-400 text-xs font-medium block">Duration</span>
-                            <span id="trip-duration" class="text-base sm:text-lg font-bold text-white leading-snug"></span>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-4 sm:mt-5 pt-3 sm:pt-4 border-t border-white/10">
+                        <div class="bg-white/10 backdrop-blur-md p-2.5 sm:p-3 rounded-xl border border-white/10">
+                            <span class="text-slate-400 text-xs font-medium block mb-1">Duration</span>
+                            <span id="trip-duration" class="text-sm sm:text-base font-bold text-white leading-snug"></span>
                         </div>
-                        <div class="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10">
-                            <span class="text-slate-400 text-xs font-medium block">Flights</span>
-                            <span id="trip-flights" class="text-xs sm:text-sm font-bold text-white"></span>
+                        <div class="bg-white/10 backdrop-blur-md p-2.5 sm:p-3 rounded-xl border border-white/10">
+                            <span class="text-slate-400 text-xs font-medium block mb-1">Flights</span>
+                            <span id="trip-flights" class="text-xs font-bold text-white"></span>
                         </div>
-                        <div class="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10">
-                            <span class="text-slate-400 text-xs font-medium block">Hotels Split Stay</span>
+                        <div class="bg-white/10 backdrop-blur-md p-2.5 sm:p-3 rounded-xl border border-white/10">
+                            <span class="text-slate-400 text-xs font-medium block mb-1">Hotels</span>
                             <span id="trip-hotels" class="text-xs font-bold text-white leading-tight"></span>
                         </div>
-                        <div class="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10">
-                            <span class="text-slate-400 text-xs font-medium block">Winter Weather</span>
-                            <span class="text-lg font-bold text-white flex items-center space-x-1.5">
+                        <div class="bg-white/10 backdrop-blur-md p-2.5 sm:p-3 rounded-xl border border-white/10">
+                            <span class="text-slate-400 text-xs font-medium block mb-1">Weather</span>
+                            <span class="text-base font-bold text-white flex items-center space-x-1">
                                 <i class="fa-solid fa-snowflake text-sky-300"></i>
                                 <span id="trip-weather"></span>
                             </span>
@@ -171,11 +175,13 @@
                 <!-- Right Column: Flight, Hotels & Packing Checklist -->
                 <div class="space-y-6">
                     
-                    <!-- Flight Summary Card -->
-                    <div id="flight-summary" class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm"></div>
-                    <!-- Flight summary is populated from JSONBin. -->
+                    <!-- Flight Summary Card (hidden - consolidated into Transportation Card) -->
+                    <div id="flight-summary" class="hidden bg-white rounded-3xl p-6 border border-slate-200 shadow-sm"></div>
                     <div id="accommodation-summary" class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm"></div>
                     <!-- Accommodation summary is populated from JSONBin. -->
+                    <!-- Transportation Card (Flights + Buses + Trains + All Other Transports) -->
+                    <div id="transport-summary" class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm"></div>
+                    <!-- Transportation summary is populated dynamically. -->
                     <!-- Packing Checklist Widget -->
                     <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
                         <div class="flex items-center justify-between mb-4">
@@ -211,6 +217,26 @@
         </div>
 
         <!-- Live Google Maps View -->
+        <div id="view-transports" class="hidden space-y-6">
+            <div class="bg-white rounded-3xl p-4 sm:p-8 border border-slate-200 shadow-sm">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <div>
+                        <span class="text-brand-600 text-xs font-bold uppercase tracking-wider block mb-1">Transportation Management</span>
+                        <h3 class="text-2xl font-bold text-slate-900">Manage Your Transports</h3>
+                        <p class="text-slate-500 text-sm mt-1">Add, edit, and view all your pre-booked transportation options for your trip.</p>
+                    </div>
+                    <button onclick="openAddTransportDialog()" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-xl font-semibold text-sm transition active:scale-95">
+                        <i class="fa-solid fa-plus mr-2"></i>Add Transport
+                    </button>
+                </div>
+
+                <!-- Transports List -->
+                <div id="transports-list" class="space-y-3">
+                    <!-- Transports dynamically populated -->
+                </div>
+            </div>
+        </div>
+
         <div id="view-mapview" class="hidden space-y-6">
             <div class="bg-white rounded-3xl p-4 sm:p-8 border border-slate-200 shadow-sm">
                 <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -312,6 +338,73 @@
             </div>
         </div>
     </div>
+    <div id="transport-dialog" class="hidden fixed inset-0 z-[60] bg-slate-950/50 p-4 flex items-center justify-center">
+        <form onsubmit="saveTransport(event)" class="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-3xl bg-white p-5 sm:p-7 shadow-2xl">
+            <div class="flex items-start justify-between gap-4 mb-5">
+                <div>
+                    <span class="text-brand-600 text-xs font-bold uppercase tracking-wider">Add Transport</span>
+                    <h2 id="transport-dialog-title" class="text-xl font-bold text-slate-900 mt-1">New Transport Booking</h2>
+                </div>
+                <button type="button" onclick="closeTransportDialog()" aria-label="Close dialog" class="text-slate-400 hover:text-slate-700 text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label class="text-sm font-semibold text-slate-700">
+                    Transport Type *
+                    <select id="transport-type" required class="mt-1 w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-normal outline-none focus:border-brand-500">
+                        <option value="">Select type...</option>
+                        <option value="bus">🚌 Bus</option>
+                        <option value="train">🚆 Train</option>
+                        <option value="metro">🚇 Metro</option>
+                        <option value="taxi">🚕 Taxi</option>
+                        <option value="uber">🚗 Uber / Ride-share</option>
+                        <option value="car">🚗 Car Rental</option>
+                        <option value="flight">✈️ Flight</option>
+                        <option value="other">📍 Other</option>
+                    </select>
+                </label>
+                <label class="text-sm font-semibold text-slate-700">
+                    From Location *
+                    <input id="transport-from" required type="text" class="mt-1 w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-normal outline-none focus:border-brand-500" placeholder="e.g., Penn Station">
+                </label>
+                <label class="text-sm font-semibold text-slate-700">
+                    To Location *
+                    <input id="transport-to" required type="text" class="mt-1 w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-normal outline-none focus:border-brand-500" placeholder="e.g., Airport">
+                </label>
+                <label class="text-sm font-semibold text-slate-700">
+                    Departure Time *
+                    <input id="transport-departure" required type="datetime-local" class="mt-1 w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-normal outline-none focus:border-brand-500">
+                </label>
+                <label class="text-sm font-semibold text-slate-700">
+                    Arrival Time
+                    <input id="transport-arrival" type="datetime-local" class="mt-1 w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-normal outline-none focus:border-brand-500">
+                </label>
+                <label class="text-sm font-semibold text-slate-700">
+                    Booking Reference
+                    <input id="transport-booking-ref" type="text" class="mt-1 w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-normal outline-none focus:border-brand-500" placeholder="e.g., BUS123456">
+                </label>
+                <label class="text-sm font-semibold text-slate-700">
+                    Price ($)
+                    <input id="transport-price" type="number" step="0.01" class="mt-1 w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-normal outline-none focus:border-brand-500" placeholder="e.g., 45.50">
+                </label>
+                <label class="text-sm font-semibold text-slate-700 sm:col-span-2">
+                    Provider/Company
+                    <input id="transport-provider" type="text" class="mt-1 w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-normal outline-none focus:border-brand-500" placeholder="e.g., Greyhound, Amtrak">
+                </label>
+                <label class="text-sm font-semibold text-slate-700 sm:col-span-2">
+                    Notes
+                    <textarea id="transport-notes" rows="2" class="mt-1 w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-normal outline-none focus:border-brand-500" placeholder="Additional details..."></textarea>
+                </label>
+            </div>
+            <p id="transport-dialog-error" class="hidden text-sm text-red-600 mt-3"></p>
+            <div class="flex justify-end gap-2 mt-6">
+                <button type="button" onclick="closeTransportDialog()" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200">Cancel</button>
+                <button id="transport-submit-label" type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600">Add Transport</button>
+            </div>
+        </form>
+    </div>
+
     <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center space-x-3 text-sm font-medium border border-slate-700">
         <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
         <span id="toastMessage">Action completed successfully.</span>
@@ -402,21 +495,24 @@
         function renderDashboard() {
             const flights = tripPlan.confirmed.flights || [];
             const hotels = tripPlan.confirmed.hotels || [];
+            const transports = tripPlan.confirmed.transports || [];
             const itineraryDays = Object.keys(itineraryData).length;
             const nights = Math.max(0, itineraryDays - 1);
             const flightNames = flights.map(flight => `${flight.flight}: ${flight.from} → ${flight.to}`).join(' · ');
+            const allTransports = [...flights, ...transports];
+            const transportSummary = allTransports.length ? `${allTransports.length} transport${allTransports.length === 1 ? '' : 's'} confirmed` : 'No transports recorded';
 
             document.getElementById('header-trip-label').textContent = flightNames;
             document.getElementById('header-trip-name').textContent = tripPlan.trip.name || '';
             document.getElementById('trip-date-range').textContent = `${formatDate(tripPlan.trip.startDate, { month: 'short', day: 'numeric' })} - ${formatDate(tripPlan.trip.endDate, { month: 'short', day: 'numeric', year: 'numeric' })}`;
-            document.getElementById('flight-status').textContent = flights.length ? `${flights.length} flight${flights.length === 1 ? '' : 's'} confirmed` : 'No flights recorded';
+            document.getElementById('flight-status').textContent = transportSummary;
             document.getElementById('trip-title').textContent = tripPlan.title || tripPlan.trip.name || '';
             document.getElementById('trip-subtitle').textContent = tripPlan.subtitle || '';
             document.getElementById('trip-duration').textContent = `${itineraryDays} Days / ${nights} Nights`;
             document.getElementById('trip-flights').textContent = flightNames;
             document.getElementById('trip-hotels').textContent = hotels.map(hotel => hotel.name).join(' → ');
             document.getElementById('trip-weather').textContent = tripPlan.weather || '';
-            document.getElementById('hero-image').src = tripPlan.heroImage || '';
+            document.getElementById('hero-image').src = tripPlan.heroImage || 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=1200&h=600&fit=crop';
             document.getElementById('hero-image').alt = tripPlan.title || tripPlan.trip.name || '';
             document.getElementById('footer-text').textContent = `${tripPlan.trip.name || ''} · ${flightNames}`;
 
@@ -448,6 +544,56 @@
                             <div class="text-xs text-emerald-600 mt-1">${escapeHtml(hotel.from)} - ${escapeHtml(hotel.to)}</div>
                         </div>
                     `).join('')}
+                </div>
+            `;
+
+            const getTransportIcon = (type) => {
+                const icons = {
+                    'flight': 'fa-plane',
+                    'bus': 'fa-bus',
+                    'train': 'fa-train',
+                    'car': 'fa-car',
+                    'rental': 'fa-car',
+                    'taxi': 'fa-taxi',
+                    'uber': 'fa-car',
+                    'metro': 'fa-train',
+                    'subway': 'fa-train'
+                };
+                return icons[type?.toLowerCase()] || 'fa-shuttle-van';
+            };
+
+            const getTransportLabel = (transport) => {
+                if (transport.type) return transport.type;
+                if (transport.flight) return 'Flight';
+                return 'Transport';
+            };
+
+            document.getElementById('transport-summary').innerHTML = `
+                <h3 class="font-bold text-slate-900 text-base mb-4 flex items-center space-x-2">
+                    <i class="fa-solid fa-shuttle-van text-brand-500"></i>
+                    <span>Transportation</span>
+                </h3>
+                <div class="space-y-3 text-sm">
+                    ${flights.map(flight => `
+                        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                            <span class="text-xs font-bold text-brand-600 uppercase">${escapeHtml(flight.flight || 'Flight')}</span>
+                            <div class="font-bold text-slate-900 mt-1">${escapeHtml(flight.from)} → ${escapeHtml(flight.to)}</div>
+                            <div class="text-xs text-slate-500 mt-0.5">${escapeHtml(formatFlightDateTime(flight.departure))} - ${escapeHtml(formatFlightDateTime(flight.arrival))}</div>
+                        </div>
+                    `).join('')}
+                    ${transports.map(transport => `
+                        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                            <span class="text-xs font-bold text-brand-600 uppercase flex items-center space-x-1.5">
+                                <i class="fa-solid ${getTransportIcon(transport.type)}"></i>
+                                <span>${escapeHtml(transport.type || 'Transport')}</span>
+                            </span>
+                            <div class="font-bold text-slate-900 mt-1">${escapeHtml(transport.from || '')} → ${escapeHtml(transport.to || '')}</div>
+                            <div class="text-xs text-slate-500 mt-0.5">${escapeHtml(transport.departureTime || '')}${transport.arrivalTime ? ' - ' + escapeHtml(transport.arrivalTime) : ''}</div>
+                            ${transport.bookingRef ? `<div class="text-xs text-emerald-600 mt-1">Booking: ${escapeHtml(transport.bookingRef)}</div>` : ''}
+                            ${transport.price ? `<div class="text-xs font-semibold text-brand-600 mt-1">$${escapeHtml(transport.price)}</div>` : ''}
+                        </div>
+                    `).join('')}
+                    ${allTransports.length === 0 ? '<div class="text-xs text-slate-500 italic">No transports booked yet</div>' : ''}
                 </div>
             `;
 
@@ -935,7 +1081,7 @@
                                         ${navigationId ? `<button type="button" onclick="openNavigationDialog('${navigationId}')" class="inline-flex items-center gap-1 rounded-lg bg-white border border-emerald-200 px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"><i class="fa-solid fa-route"></i> Navigate</button>` : ''}
                                     </div>
                                 </div>
-                                <span class="block text-xs text-emerald-700">${escapeHtml(event.detail || event.location || '')} - ${event.from} to ${event.to}</span>
+                                <span class="block text-xs text-emerald-700">${escapeHtml(event.detail || '')}${event.detail ? ' - ' : ''}${event.from} to ${event.to}</span>
                                 ${event.location ? `<span class="block text-xs text-emerald-700 mt-1"><i class="fa-solid fa-location-dot mr-1"></i>${escapeHtml(event.location)}</span>` : ''}
                             </div>
                         </div>
@@ -965,27 +1111,199 @@
         function openTab(tabName) {
             const itinView = document.getElementById('view-itinerary');
             const mapView = document.getElementById('view-mapview');
+            const transView = document.getElementById('view-transports');
             const btnItin = document.getElementById('nav-btn-itinerary');
             const btnMap = document.getElementById('nav-btn-mapview');
+            const btnTrans = document.getElementById('nav-btn-transports');
 
             const activeClasses = "flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-brand-500 text-white px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95 shadow-sm";
             const inactiveClasses = "flex-1 sm:flex-none justify-center inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-sm font-medium transition active:scale-95";
 
+            itinView.classList.add('hidden');
+            mapView.classList.add('hidden');
+            transView.classList.add('hidden');
+            btnItin.className = inactiveClasses;
+            btnMap.className = inactiveClasses;
+            btnTrans.className = inactiveClasses;
+
             if (tabName === 'itinerary') {
                 itinView.classList.remove('hidden');
-                mapView.classList.add('hidden');
                 btnItin.className = activeClasses;
-                btnMap.className = inactiveClasses;
-            } else {
-                itinView.classList.add('hidden');
+            } else if (tabName === 'transports') {
+                transView.classList.remove('hidden');
+                btnTrans.className = activeClasses;
+                renderTransportsList();
+            } else if (tabName === 'mapview') {
                 mapView.classList.remove('hidden');
                 btnMap.className = activeClasses;
-                btnItin.className = inactiveClasses;
-                
                 updateOpenStreetMap(currentActiveDay);
                 setTimeout(() => routeMap?.invalidateSize(), 0);
             }
         }
+
+        function getTransportIcon(type) {
+            const icons = {
+                'flight': 'fa-plane',
+                'bus': 'fa-bus',
+                'train': 'fa-train',
+                'car': 'fa-car',
+                'rental': 'fa-car',
+                'taxi': 'fa-taxi',
+                'uber': 'fa-car',
+                'metro': 'fa-train',
+                'subway': 'fa-train'
+            };
+            return icons[type?.toLowerCase()] || 'fa-shuttle-van';
+        }
+
+        function formatTransportDateTime(dateTimeString) {
+            if (!dateTimeString) return '';
+            // Handle ISO format: 2026-12-14T14:00
+            if (dateTimeString.includes('T')) {
+                const date = new Date(dateTimeString);
+                return new Intl.DateTimeFormat(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                }).format(date);
+            }
+            // Handle display format: 2026-12-14 14:00 or time-only: 14:00
+            if (dateTimeString.includes(' ')) {
+                const [date, time] = dateTimeString.split(' ');
+                return `${date} ${time}`;
+            }
+            // If it's just a time (HH:MM), return as-is
+            if (dateTimeString.match(/^\d{2}:\d{2}$/)) {
+                return dateTimeString;
+            }
+            return dateTimeString;
+        }
+
+        function openAddTransportDialog() {
+            document.getElementById('transport-dialog').classList.remove('hidden');
+            document.getElementById('transport-dialog').style.display = 'flex';
+            document.getElementById('transport-dialog-title').textContent = 'New Transport Booking';
+            document.getElementById('transport-submit-label').textContent = 'Add Transport';
+            document.getElementById('transport-type').value = '';
+            document.getElementById('transport-from').value = '';
+            document.getElementById('transport-to').value = '';
+            document.getElementById('transport-departure').value = '';
+            document.getElementById('transport-arrival').value = '';
+            document.getElementById('transport-booking-ref').value = '';
+            document.getElementById('transport-price').value = '';
+            document.getElementById('transport-provider').value = '';
+            document.getElementById('transport-notes').value = '';
+            document.getElementById('transport-dialog-error').classList.add('hidden');
+        }
+
+        function closeTransportDialog() {
+            document.getElementById('transport-dialog').classList.add('hidden');
+            document.getElementById('transport-dialog').style.display = 'none';
+        }
+
+        function saveTransport(event) {
+            event.preventDefault();
+            const type = document.getElementById('transport-type').value;
+            const from = document.getElementById('transport-from').value;
+            const to = document.getElementById('transport-to').value;
+            const departure = document.getElementById('transport-departure').value;
+            const arrival = document.getElementById('transport-arrival').value;
+            const bookingRef = document.getElementById('transport-booking-ref').value;
+            const price = document.getElementById('transport-price').value;
+            const provider = document.getElementById('transport-provider').value;
+            const notes = document.getElementById('transport-notes').value;
+
+            if (!type || !from || !to || !departure) {
+                document.getElementById('transport-dialog-error').textContent = 'Please fill in all required fields';
+                document.getElementById('transport-dialog-error').classList.remove('hidden');
+                return;
+            }
+
+            if (!tripPlan.confirmed.transports) {
+                tripPlan.confirmed.transports = [];
+            }
+
+            const newTransport = {
+                type,
+                from,
+                to,
+                departureTime: departure,
+                arrivalTime: arrival,
+                bookingRef,
+                price: price ? Number(price) : null,
+                provider,
+                notes
+            };
+
+            tripPlan.confirmed.transports.push(newTransport);
+            saveTripData();
+            closeTransportDialog();
+            renderTransportsList();
+            showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} booking added successfully!`);
+        }
+
+        function deleteTransport(index) {
+            if (confirm('Are you sure you want to delete this transport?')) {
+                tripPlan.confirmed.transports.splice(index, 1);
+                saveTripData();
+                renderTransportsList();
+                showToast('Transport deleted successfully!');
+            }
+        }
+
+        function renderTransportsList() {
+            const transportsList = document.getElementById('transports-list');
+            const transports = tripPlan.confirmed.transports || [];
+
+            if (transports.length === 0) {
+                transportsList.innerHTML = `
+                    <div class="text-center py-12 text-slate-500">
+                        <i class="fa-solid fa-shuttle-van text-4xl text-slate-300 mb-4 block"></i>
+                        <p class="text-sm">No transports added yet</p>
+                        <p class="text-xs mt-2">Click "Add Transport" to book your first ride</p>
+                    </div>
+                `;
+                return;
+            }
+
+            transportsList.innerHTML = transports.map((transport, index) => `
+                <div class="bg-gradient-to-br from-slate-50 to-slate-100 p-4 rounded-2xl border border-slate-200 hover:border-brand-300 hover:shadow-md transition">
+                    <div class="flex items-start justify-between gap-3 mb-3">
+                        <div class="flex items-center gap-3 flex-1 min-w-0">
+                            <div class="w-10 h-10 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid ${getTransportIcon(transport.type)}"></i>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h4 class="font-bold text-slate-900 capitalize">${escapeHtml(transport.type)}</h4>
+                                <p class="text-sm text-slate-600">${escapeHtml(transport.from)} → ${escapeHtml(transport.to)}</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="deleteTransport(${index})" class="text-red-500 hover:text-red-700 text-sm font-semibold flex-shrink-0">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-xs mb-3">
+                        <div>
+                            <span class="text-slate-500 block">Departure</span>
+                            <span class="text-slate-900 font-semibold">${escapeHtml(formatTransportDateTime(transport.departureTime))}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block">Arrival</span>
+                            <span class="text-slate-900 font-semibold">${escapeHtml(transport.arrivalTime ? formatTransportDateTime(transport.arrivalTime) : '—')}</span>
+                        </div>
+                    </div>
+
+                    ${transport.bookingRef ? `<div class="text-xs"><span class="text-slate-500">Booking Reference:</span> <span class="font-mono font-bold text-emerald-600">${escapeHtml(transport.bookingRef)}</span></div>` : ''}
+                    ${transport.provider ? `<div class="text-xs text-slate-600"><span class="text-slate-500">Provider:</span> ${escapeHtml(transport.provider)}</div>` : ''}
+                    ${transport.price ? `<div class="text-xs"><span class="text-slate-500">Price:</span> <span class="font-bold text-brand-600">$${Number(transport.price).toFixed(2)}</span></div>` : ''}
+                    ${transport.notes ? `<div class="text-xs text-slate-700 mt-2 p-2 bg-white rounded border border-slate-100"><span class="text-slate-500">Notes:</span> ${escapeHtml(transport.notes)}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
 
         function initializeRouteMap() {
             if (routeMap || !window.L) return;
@@ -1259,6 +1577,11 @@
             }
         }
 
+        function saveTripData() {
+            renderDashboard();
+            saveRemotePlan().catch(err => console.error('Failed to save trip data:', err));
+        }
+
         function showToast(message) {
             const toast = document.getElementById('toast');
             const msgEl = document.getElementById('toastMessage');
@@ -1276,6 +1599,7 @@
                 const firstDay = Number(Object.keys(itineraryData)[0]);
                 if (!firstDay) throw new Error('Trip data does not contain any itinerary days.');
                 renderDashboard();
+                renderTransportsList();
                 currentActiveDay = firstDay;
                 switchDay(firstDay);
                 renderChecklist();

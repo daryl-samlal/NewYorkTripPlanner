@@ -238,11 +238,11 @@
 
     <!-- Interactive Toast Notification -->
     <div id="event-dialog" class="hidden fixed inset-0 z-[60] bg-slate-950/50 p-4 items-center justify-center">
-        <form onsubmit="saveNewEvent(event)" class="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-3xl bg-white p-5 sm:p-7 shadow-2xl">
+        <form onsubmit="saveEvent(event)" class="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-3xl bg-white p-5 sm:p-7 shadow-2xl">
             <div class="flex items-start justify-between gap-4 mb-5">
                 <div>
                     <span class="text-brand-600 text-xs font-bold uppercase tracking-wider">Open planning</span>
-                    <h2 class="text-xl font-bold text-slate-900 mt-1">Add a new event</h2>
+                    <h2 id="event-dialog-title" class="text-xl font-bold text-slate-900 mt-1">Add a new event</h2>
                 </div>
                 <button type="button" onclick="closeEventDialog()" aria-label="Close dialog" class="text-slate-400 hover:text-slate-700 text-xl">
                     <i class="fa-solid fa-xmark"></i>
@@ -275,9 +275,42 @@
             <p id="event-dialog-error" class="hidden text-sm text-red-600 mt-3"></p>
             <div class="flex justify-end gap-2 mt-6">
                 <button type="button" onclick="closeEventDialog()" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200">Cancel</button>
-                <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600">Add event</button>
+                <button id="event-submit-label" type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600">Add event</button>
             </div>
         </form>
+    </div>
+    <div id="navigation-dialog" class="hidden fixed inset-0 z-[60] bg-slate-950/50 p-4 items-center justify-center">
+        <div class="w-full max-w-lg rounded-3xl bg-white p-5 sm:p-7 shadow-2xl">
+            <div class="flex items-start justify-between gap-4 mb-5">
+                <div>
+                    <span class="text-brand-600 text-xs font-bold uppercase tracking-wider">Google Maps</span>
+                    <h2 class="text-xl font-bold text-slate-900 mt-1">Navigate to event</h2>
+                    <p id="navigation-destination" class="text-sm text-slate-500 mt-1"></p>
+                </div>
+                <button type="button" onclick="closeNavigationDialog()" aria-label="Close navigation dialog" class="text-slate-400 hover:text-slate-700 text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm font-semibold text-slate-700 block mb-2">Starting point</label>
+                    <button id="current-location-button" type="button" onclick="useCurrentLocation()" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600">
+                        <i class="fa-solid fa-location-crosshairs"></i>
+                        <span>Use my current location</span>
+                    </button>
+                    <p id="current-location-status" class="text-xs text-slate-500 mt-1"></p>
+                </div>
+                <div class="text-center text-xs text-slate-400">or choose a saved event location</div>
+                <select id="saved-origin-location" onchange="selectSavedNavigationOrigin(this.value)" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-brand-500">
+                    <option value="">Choose a saved location</option>
+                </select>
+            </div>
+            <p id="navigation-dialog-error" class="hidden text-sm text-red-600 mt-3"></p>
+            <div class="flex justify-end gap-2 mt-6">
+                <button type="button" onclick="closeNavigationDialog()" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200">Cancel</button>
+                <button type="button" onclick="startNavigation()" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600">Open Google Maps</button>
+            </div>
+        </div>
     </div>
     <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center space-x-3 text-sm font-medium border border-slate-700">
         <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
@@ -429,9 +462,20 @@
 
         let selectedEventLocation = null;
         let eventLocationSearchTimer;
+        const navigationTargets = new Map();
+        const eventTargets = new Map();
+        let navigationDestination = null;
+        let navigationOrigin = null;
+        let navigationSavedLocations = [];
+        let editingEvent = null;
+        let editingEventDay = null;
 
         function openEventDialog() {
             const dialog = document.getElementById('event-dialog');
+            editingEvent = null;
+            editingEventDay = null;
+            document.getElementById('event-dialog-title').textContent = 'Add a new event';
+            document.getElementById('event-submit-label').textContent = 'Add event';
             document.getElementById('event-title').value = '';
             document.getElementById('event-from').value = '09:00';
             document.getElementById('event-to').value = '10:00';
@@ -442,6 +486,35 @@
             document.getElementById('event-location-selected').textContent = '';
             document.getElementById('event-dialog-error').classList.add('hidden');
             selectedEventLocation = null;
+            dialog.classList.remove('hidden');
+            dialog.classList.add('flex');
+            document.getElementById('event-title').focus();
+        }
+
+        function openEditEventDialog(targetId) {
+            const event = eventTargets.get(targetId);
+            if (!event) return;
+
+            editingEvent = event.event;
+            editingEventDay = event.dayNum;
+            const displayEvent = event.displayEvent;
+            selectedEventLocation = displayEvent.location ? {
+                name: displayEvent.location,
+                latitude: displayEvent.coordinates?.[0],
+                longitude: displayEvent.coordinates?.[1]
+            } : null;
+            document.getElementById('event-dialog-title').textContent = 'Edit approved event';
+            document.getElementById('event-submit-label').textContent = 'Save changes';
+            document.getElementById('event-title').value = displayEvent.title || '';
+            document.getElementById('event-from').value = displayEvent.from || '';
+            document.getElementById('event-to').value = displayEvent.to || '';
+            document.getElementById('event-location').value = displayEvent.location || '';
+            document.getElementById('event-notes').value = displayEvent.detail || '';
+            document.getElementById('event-location-results').innerHTML = '';
+            document.getElementById('event-location-results').classList.add('hidden');
+            document.getElementById('event-location-selected').textContent = displayEvent.location ? 'Location selected' : '';
+            document.getElementById('event-dialog-error').classList.add('hidden');
+            const dialog = document.getElementById('event-dialog');
             dialog.classList.remove('hidden');
             dialog.classList.add('flex');
             document.getElementById('event-title').focus();
@@ -500,7 +573,7 @@
             results.classList.add('hidden');
         }
 
-        async function saveNewEvent(event) {
+        async function saveEvent(event) {
             event.preventDefault();
             const errorElement = document.getElementById('event-dialog-error');
             const from = document.getElementById('event-from').value;
@@ -510,33 +583,191 @@
                 errorElement.classList.remove('hidden');
                 return;
             }
-            if (timeToMinutes(to) <= timeToMinutes(from)) {
-                errorElement.textContent = 'The end time must be after the start time.';
+            if (timeToMinutes(to) === timeToMinutes(from)) {
+                errorElement.textContent = 'The start and end times cannot be the same.';
                 errorElement.classList.remove('hidden');
                 return;
             }
 
-            const newEvent = {
-                id: `event-${Date.now()}`,
+            const eventData = {
                 from,
                 to,
                 title: document.getElementById('event-title').value.trim(),
                 detail: document.getElementById('event-notes').value.trim(),
                 location: selectedEventLocation.name,
-                coordinates: [selectedEventLocation.latitude, selectedEventLocation.longitude]
+                coordinates: Number.isFinite(selectedEventLocation.latitude) && Number.isFinite(selectedEventLocation.longitude)
+                    ? [selectedEventLocation.latitude, selectedEventLocation.longitude]
+                    : editingEvent?.coordinates
             };
-            confirmedEvents[currentActiveDay] = [...(confirmedEvents[currentActiveDay] || []), newEvent];
-            tripPlan.days[currentActiveDay] = {
-                ...(tripPlan.days[currentActiveDay] || {}),
-                events: (tripPlan.days[currentActiveDay]?.events || []).concat(newEvent)
-            };
+            const savedEvent = editingEvent
+                ? Object.assign(editingEvent, eventData)
+                : { id: `event-${Date.now()}`, ...eventData };
+            if (!editingEvent) {
+                confirmedEvents[currentActiveDay] = [...(confirmedEvents[currentActiveDay] || []), savedEvent];
+                tripPlan.days[currentActiveDay] = {
+                    ...(tripPlan.days[currentActiveDay] || {}),
+                    events: (tripPlan.days[currentActiveDay]?.events || []).concat(savedEvent)
+                };
+            }
             const storedEvents = JSON.parse(localStorage.getItem(eventStorageKey) || '{}');
-            storedEvents[currentActiveDay] = (storedEvents[currentActiveDay] || []).concat(newEvent);
+            const eventDay = editingEvent ? editingEventDay : currentActiveDay;
+            if (savedEvent.id) {
+                const storedDayEvents = storedEvents[eventDay] || [];
+                const storedIndex = storedDayEvents.findIndex(item => item.id === savedEvent.id);
+                if (storedIndex >= 0) storedDayEvents[storedIndex] = savedEvent;
+                else storedDayEvents.push(savedEvent);
+                storedEvents[eventDay] = storedDayEvents;
+            }
             localStorage.setItem(eventStorageKey, JSON.stringify(storedEvents));
-            await saveRemotePlan();
+            try {
+                await saveRemotePlan();
+            } catch (error) {
+                errorElement.textContent = 'The event was changed locally, but could not be saved to the shared plan.';
+                errorElement.classList.remove('hidden');
+                console.error('Unable to save event changes', error);
+                return;
+            }
             closeEventDialog();
             switchDay(currentActiveDay);
-            showToast('Event added to your itinerary');
+            showToast(editingEvent ? 'Event changes saved' : 'Event added to your itinerary');
+        }
+
+        function registerNavigationTarget(event) {
+            const id = `navigation-target-${navigationTargets.size}`;
+            navigationTargets.set(id, event);
+            return id;
+        }
+
+        function registerEventTarget(event, dayNum) {
+            const id = `event-target-${eventTargets.size}`;
+            eventTargets.set(id, {
+                event: event._sourceEvent || event,
+                displayEvent: event,
+                dayNum: event._sourceDay || dayNum
+            });
+            return id;
+        }
+
+        function getSavedNavigationLocations() {
+            const locations = [];
+            Object.values(confirmedEvents).flat().forEach(event => {
+                if (!event.location) return;
+                const key = event.coordinates
+                    ? event.coordinates.join(',')
+                    : event.location;
+                if (!locations.some(location => location.key === key)) {
+                    locations.push({
+                        key,
+                        name: event.location,
+                        coordinates: event.coordinates,
+                        event
+                    });
+                }
+            });
+            return locations;
+        }
+
+        function openNavigationDialog(targetId) {
+            navigationDestination = navigationTargets.get(targetId);
+            if (!navigationDestination?.location) return;
+
+            navigationOrigin = null;
+            navigationSavedLocations = getSavedNavigationLocations();
+            document.getElementById('navigation-destination').textContent = navigationDestination.location;
+            document.getElementById('current-location-status').textContent = '';
+            document.getElementById('navigation-dialog-error').classList.add('hidden');
+            document.getElementById('saved-origin-location').innerHTML = `
+                <option value="">Choose a saved location</option>
+                ${navigationSavedLocations.map((location, index) => `
+                    <option value="${index}">${escapeHtml(location.name)}</option>
+                `).join('')}
+            `;
+            document.getElementById('navigation-dialog').classList.remove('hidden');
+            document.getElementById('navigation-dialog').classList.add('flex');
+        }
+
+        function closeNavigationDialog() {
+            const dialog = document.getElementById('navigation-dialog');
+            dialog.classList.add('hidden');
+            dialog.classList.remove('flex');
+            navigationDestination = null;
+            navigationOrigin = null;
+        }
+
+        function useCurrentLocation() {
+            const status = document.getElementById('current-location-status');
+            const errorElement = document.getElementById('navigation-dialog-error');
+            if (!navigator.geolocation) {
+                errorElement.textContent = 'Current location is not available in this browser.';
+                errorElement.classList.remove('hidden');
+                return;
+            }
+
+            status.textContent = 'Requesting your current location...';
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    navigationOrigin = {
+                        name: 'Current location',
+                        coordinates: [position.coords.latitude, position.coords.longitude]
+                    };
+                    document.getElementById('saved-origin-location').value = '';
+                    status.textContent = 'Current location selected.';
+                    errorElement.classList.add('hidden');
+                },
+                error => {
+                    status.textContent = '';
+                    errorElement.textContent = `Unable to get your current location (${error.message}).`;
+                    errorElement.classList.remove('hidden');
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+
+        function selectSavedNavigationOrigin(value) {
+            if (value === '') {
+                navigationOrigin = null;
+                return;
+            }
+            navigationOrigin = navigationSavedLocations[Number(value)] || null;
+            document.getElementById('current-location-status').textContent = navigationOrigin
+                ? `${navigationOrigin.name} selected.`
+                : '';
+        }
+
+        async function startNavigation() {
+            const errorElement = document.getElementById('navigation-dialog-error');
+            if (!navigationOrigin || !navigationDestination) {
+                errorElement.textContent = 'Choose your current location or a saved starting location.';
+                errorElement.classList.remove('hidden');
+                return;
+            }
+
+            const mapsWindow = window.open('', '_blank');
+            try {
+                const destinationCoordinates = Array.isArray(navigationDestination.coordinates)
+                    && navigationDestination.coordinates.every(Number.isFinite)
+                    ? navigationDestination.coordinates
+                    : await geocodeLocation(navigationDestination.location);
+                const originCoordinates = Array.isArray(navigationOrigin.coordinates)
+                    && navigationOrigin.coordinates.every(Number.isFinite)
+                    ? navigationOrigin.coordinates
+                    : await geocodeLocation(navigationOrigin.name);
+                if (!destinationCoordinates || !originCoordinates) {
+                    throw new Error('Coordinates could not be found for the selected locations.');
+                }
+                const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(originCoordinates.join(','))}&destination=${encodeURIComponent(destinationCoordinates.join(','))}`;
+                if (mapsWindow) {
+                    mapsWindow.location.href = url;
+                } else {
+                    window.location.href = url;
+                }
+                closeNavigationDialog();
+            } catch (error) {
+                mapsWindow?.close();
+                errorElement.textContent = error.message;
+                errorElement.classList.remove('hidden');
+                console.error('Unable to create navigation plan', error);
+            }
         }
 
         async function loadTripPlan() {
@@ -583,7 +814,7 @@
             if (!url || !writeKey || url.startsWith('./')) return;
 
             try {
-                await fetch(url, {
+                const response = await fetch(url, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -591,8 +822,10 @@
                     },
                     body: JSON.stringify(tripPlan)
                 });
+                if (!response.ok) throw new Error(`Shared trip plan save failed with status ${response.status}`);
             } catch (error) {
                 console.error('Unable to save shared trip plan', error);
+                throw error;
             }
         }
 
@@ -609,16 +842,15 @@
         }
 
         function splitOpenTime(start, end) {
-            const segments = [];
-            let cursor = start;
+            return start < end ? [{ type: 'open', start, end }] : [];
+        }
 
-            while (cursor < end) {
-                const nextHour = Math.min(end, Math.ceil((cursor + 1) / 60) * 60);
-                segments.push({ type: 'open', start: cursor, end: nextHour });
-                cursor = nextHour;
-            }
-
-            return segments;
+        function formatDuration(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const remainder = minutes % 60;
+            if (!hours) return `${remainder}m`;
+            if (!remainder) return `${hours}h`;
+            return `${hours}h ${remainder}m`;
         }
 
         function getEventsForDay(dayNum) {
@@ -628,6 +860,8 @@
                 .filter(event => timeToMinutes(event.to) <= timeToMinutes(event.from))
                 .forEach(event => events.unshift({
                     ...event,
+                    _sourceEvent: event,
+                    _sourceDay: dayNum - 1,
                     from: '00:00',
                     to: event.to
                 }));
@@ -638,13 +872,17 @@
             const segments = [];
             let cursor = 0;
             const sortedEvents = dayEvents
-                .map(event => ({
-                    ...event,
-                    start: timeToMinutes(event.from),
-                    end: timeToMinutes(event.to) <= timeToMinutes(event.from)
-                        ? timeToMinutes(event.to) + 1440
-                        : timeToMinutes(event.to)
-                }))
+                .map(event => {
+                    const sourceEvent = event._sourceEvent || event;
+                    return {
+                        ...event,
+                        _sourceEvent: sourceEvent,
+                        start: timeToMinutes(event.from),
+                        end: timeToMinutes(event.to) <= timeToMinutes(event.from)
+                            ? timeToMinutes(event.to) + 1440
+                            : timeToMinutes(event.to)
+                    };
+                })
                 .filter(event => event.end > event.start)
                 .sort((a, b) => a.start - b.start);
 
@@ -684,12 +922,20 @@
 
                 if (segment.type === 'event') {
                     const event = segment.event;
+                    const eventId = registerEventTarget(event, dayNum);
+                    const navigationId = event.location ? registerNavigationTarget(event) : '';
                     return `
                         <div class="grid grid-cols-[4.5rem_1fr] sm:grid-cols-[6rem_1fr] gap-3 items-start border-b border-slate-100 py-3 last:border-0">
                             <div class="text-xs font-bold text-slate-500 pt-2">${start}<br><span class="font-normal">to ${end}</span></div>
                             <div class="rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2 text-sm">
-                                <strong class="text-emerald-800">${escapeHtml(event.title)}</strong>
-                                <span class="block text-xs text-emerald-700">${escapeHtml(event.detail || event.location || '')} Ã‚Â· ${event.from}Ã¢â‚¬â€œ${event.to}</span>
+                                <div class="flex items-start justify-between gap-2">
+                                    <strong class="text-emerald-800">${escapeHtml(event.title)}</strong>
+                                    <div class="shrink-0 flex items-center gap-1">
+                                        <button type="button" onclick="openEditEventDialog('${eventId}')" class="inline-flex items-center gap-1 rounded-lg bg-white border border-emerald-200 px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"><i class="fa-solid fa-pen"></i> Edit</button>
+                                        ${navigationId ? `<button type="button" onclick="openNavigationDialog('${navigationId}')" class="inline-flex items-center gap-1 rounded-lg bg-white border border-emerald-200 px-2 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"><i class="fa-solid fa-route"></i> Navigate</button>` : ''}
+                                    </div>
+                                </div>
+                                <span class="block text-xs text-emerald-700">${escapeHtml(event.detail || event.location || '')} - ${event.from} to ${event.to}</span>
                                 ${event.location ? `<span class="block text-xs text-emerald-700 mt-1"><i class="fa-solid fa-location-dot mr-1"></i>${escapeHtml(event.location)}</span>` : ''}
                             </div>
                         </div>
@@ -702,11 +948,11 @@
                 const plan = slot.plan || legacySlot.plan || '';
                 return `
                     <div class="grid grid-cols-[4.5rem_1fr] sm:grid-cols-[6rem_1fr] gap-3 items-start border-b border-slate-100 py-3 last:border-0">
-                        <div class="text-xs font-bold text-slate-500 pt-2">${start}<br><span class="font-normal">to ${end}</span></div>
+                        <div class="text-xs font-bold text-slate-500 pt-2">${start}<br><span class="font-normal">to ${end}</span><span class="block text-brand-600 font-semibold mt-1">${formatDuration(segment.end - segment.start)} open</span></div>
                         <div class="space-y-2">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                <input aria-label="From time for ${start}" type="time" value="${slot.from || start}" onchange="savePlanningSlot(${dayNum}, '${slotKey}', 'from', this.value)" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                                <input aria-label="To time for ${start}" type="time" value="${slot.to || end}" onchange="savePlanningSlot(${dayNum}, '${slotKey}', 'to', this.value)" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                                <input aria-label="From time for ${start}" type="time" value="${slot.from || ''}" placeholder="${start}" onchange="savePlanningSlot(${dayNum}, '${slotKey}', 'from', this.value)" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                                <input aria-label="To time for ${start}" type="time" value="${slot.to || ''}" placeholder="${end}" onchange="savePlanningSlot(${dayNum}, '${slotKey}', 'to', this.value)" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
                             </div>
                             <input aria-label="Plan for ${start}" type="text" value="${escapeHtml(plan)}" placeholder="Add plan or leave open..." onchange="savePlanningSlot(${dayNum}, '${slotKey}', 'plan', this.value)" class="w-full text-sm bg-white border border-slate-200 rounded-xl px-3 py-2">
                         </div>
@@ -885,7 +1131,7 @@
                     routeMap.fitBounds(L.latLngBounds(route.coordinates), { padding: [24, 24] });
                     const distance = route.distance ? `${route.distance.toFixed(1)} km` : 'distance unavailable';
                     const duration = route.duration ? `${Math.round(route.duration / 60)} min walk` : 'walking time unavailable';
-                    mapStatus.innerText = `${mappedLocations.length} stops routed along walkable paths Ã‚Â· ${distance} Ã‚Â· ${duration}.`;
+                    mapStatus.innerText = `${mappedLocations.length} stops routed along walkable paths - ${distance} - ${duration}.`;
                 } else {
                     routeMap.setView(routePoints[0], 16);
                     mapStatus.innerText = 'One itinerary location found; no route is needed.';
@@ -930,14 +1176,14 @@
                         <div>
                             <span class="text-brand-600 text-xs font-bold uppercase tracking-wider block mb-1">${data.date}</span>
                             <h3 class="text-xl sm:text-2xl font-bold text-slate-900">Day ${data.day}: Open Planning</h3>
-                            <p class="text-slate-500 text-sm mt-1">Only confirmed reservations are shown. Add plans to any open hour.</p>
+                            <p class="text-slate-500 text-sm mt-1">Approved events block their time. Add plans to the remaining open time.</p>
                         </div>
                         <div class="flex items-center gap-2">
                             <button onclick="openEventDialog()" class="inline-flex items-center gap-1.5 bg-brand-500 hover:bg-brand-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition">
                                 <i class="fa-solid fa-plus"></i>
                                 <span>New event</span>
                             </button>
-                            <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">${confirmedCount} confirmed item${confirmedCount === 1 ? '' : 's'}</span>
+                            <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">${confirmedCount} approved event${confirmedCount === 1 ? '' : 's'}</span>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
@@ -947,7 +1193,7 @@
                         </div>
                         <div class="rounded-2xl bg-amber-50 border border-amber-200 p-3">
                             <span class="block text-xs font-bold uppercase text-amber-700">Planning status</span>
-                            <strong class="text-sm text-amber-900">Open Ã¢â‚¬â€ ${openTimeLabel} to account for</strong>
+                            <strong class="text-sm text-amber-900">${openTimeLabel} of open time remaining</strong>
                         </div>
                     </div>
                     <div class="rounded-2xl border border-slate-200 px-3 sm:px-5">

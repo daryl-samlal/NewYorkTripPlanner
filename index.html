@@ -1011,6 +1011,65 @@
                     from: '00:00',
                     to: event.to
                 }));
+
+            // Add flights and transports for this day
+            const tripStartDate = Object.values(itineraryData)[0]?.date;
+            if (tripStartDate) {
+                const startDate = new Date(tripStartDate);
+                const targetDate = new Date(startDate);
+                targetDate.setDate(startDate.getDate() + dayNum - 1);
+                const dateStr = targetDate.toISOString().split('T')[0];
+
+                // Add flights for this day
+                const flights = tripPlan.confirmed.flights || [];
+                flights.forEach(flight => {
+                    const flightDate = flight.departure?.split('T')[0] || flight.departure?.split(' ')[0];
+                    if (flightDate === dateStr) {
+                        const depTime = flight.departure?.includes('T') 
+                            ? flight.departure.split('T')[1] 
+                            : (flight.departure?.split(' ')[1] || '00:00');
+                        const arrTime = flight.arrival?.includes('T') 
+                            ? flight.arrival.split('T')[1] 
+                            : (flight.arrival?.split(' ')[1] || '00:00');
+                        events.push({
+                            id: `flight-${flight.flight}`,
+                            title: `Flight ${flight.flight}`,
+                            detail: `${flight.from} → ${flight.to}`,
+                            from: depTime.substring(0, 5),
+                            to: arrTime.substring(0, 5),
+                            _isTransport: true,
+                            _transportType: 'flight',
+                            _transportIcon: 'fa-plane'
+                        });
+                    }
+                });
+
+                // Add other transports for this day
+                const transports = tripPlan.confirmed.transports || [];
+                transports.forEach((transport, idx) => {
+                    const transportDate = transport.departureTime?.split('T')[0] || transport.departureTime?.split(' ')[0];
+                    if (transportDate === dateStr) {
+                        const depTime = transport.departureTime?.includes('T') 
+                            ? transport.departureTime.split('T')[1] 
+                            : (transport.departureTime?.split(' ')[1] || '00:00');
+                        const arrTime = transport.arrivalTime?.includes('T') 
+                            ? transport.arrivalTime.split('T')[1] 
+                            : (transport.arrivalTime?.split(' ')[1] || '00:00');
+                        const typeLabel = transport.type?.charAt(0).toUpperCase() + transport.type?.slice(1) || 'Transport';
+                        events.push({
+                            id: `transport-${idx}`,
+                            title: typeLabel,
+                            detail: `${transport.from} → ${transport.to}`,
+                            from: depTime.substring(0, 5),
+                            to: arrTime?.substring(0, 5) || depTime.substring(0, 5),
+                            _isTransport: true,
+                            _transportType: 'transport',
+                            _transportIcon: getTransportIcon(transport.type)
+                        });
+                    }
+                });
+            }
+
             return events;
         }
 
@@ -1068,6 +1127,32 @@
 
                 if (segment.type === 'event') {
                     const event = segment.event;
+                    const isTransport = event._isTransport;
+                    
+                    if (isTransport) {
+                        // Render transport event with different styling
+                        const bgColor = event._transportType === 'flight' ? 'bg-blue-50 border-blue-200' : 'bg-purple-50 border-purple-200';
+                        const textColor = event._transportType === 'flight' ? 'text-blue-800' : 'text-purple-800';
+                        const iconBgColor = event._transportType === 'flight' ? 'bg-blue-100' : 'bg-purple-100';
+                        const iconColor = event._transportType === 'flight' ? 'text-blue-600' : 'text-purple-600';
+                        
+                        return `
+                            <div class="grid grid-cols-[4.5rem_1fr] sm:grid-cols-[6rem_1fr] gap-3 items-start border-b border-slate-100 py-3 last:border-0">
+                                <div class="text-xs font-bold text-slate-500 pt-2">${start}<br><span class="font-normal">to ${end}</span></div>
+                                <div class="rounded-xl ${bgColor} border px-3 py-2 text-sm flex items-start gap-3">
+                                    <div class="w-9 h-9 rounded-lg ${iconBgColor} ${iconColor} flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i class="fa-solid ${event._transportIcon}"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <strong class="${textColor}">${escapeHtml(event.title)}</strong>
+                                        <span class="block text-xs ${textColor}">${escapeHtml(event.detail)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    // Regular event rendering
                     const eventId = registerEventTarget(event, dayNum);
                     const navigationId = event.location ? registerNavigationTarget(event) : '';
                     return `
@@ -1255,53 +1340,74 @@
 
         function renderTransportsList() {
             const transportsList = document.getElementById('transports-list');
+            const flights = tripPlan.confirmed.flights || [];
             const transports = tripPlan.confirmed.transports || [];
+            
+            // Combine flights and transports, marking their source
+            const allItems = [
+                ...flights.map((flight, idx) => ({ ...flight, _type: 'flight', _index: idx })),
+                ...transports.map((transport, idx) => ({ ...transport, _type: 'transport', _index: idx }))
+            ];
 
-            if (transports.length === 0) {
+            if (allItems.length === 0) {
                 transportsList.innerHTML = `
                     <div class="text-center py-12 text-slate-500">
                         <i class="fa-solid fa-shuttle-van text-4xl text-slate-300 mb-4 block"></i>
-                        <p class="text-sm">No transports added yet</p>
+                        <p class="text-sm">No transports or flights added yet</p>
                         <p class="text-xs mt-2">Click "Add Transport" to book your first ride</p>
                     </div>
                 `;
                 return;
             }
 
-            transportsList.innerHTML = transports.map((transport, index) => `
-                <div class="bg-gradient-to-br from-slate-50 to-slate-100 p-4 rounded-2xl border border-slate-200 hover:border-brand-300 hover:shadow-md transition">
-                    <div class="flex items-start justify-between gap-3 mb-3">
-                        <div class="flex items-center gap-3 flex-1 min-w-0">
-                            <div class="w-10 h-10 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center flex-shrink-0">
-                                <i class="fa-solid ${getTransportIcon(transport.type)}"></i>
+            transportsList.innerHTML = allItems.map((item) => {
+                const isFlight = item._type === 'flight';
+                const type = isFlight ? item.flight : item.type;
+                const from = isFlight ? item.from : item.from;
+                const to = isFlight ? item.to : item.to;
+                const departure = isFlight ? item.departure : item.departureTime;
+                const arrival = isFlight ? item.arrival : item.arrivalTime;
+                const bookingRef = isFlight ? null : item.bookingRef;
+                const provider = isFlight ? item.flight : item.provider;
+                const price = item.price || null;
+                const notes = isFlight ? null : item.notes;
+                const typeLabel = isFlight ? 'Flight' : (item.type || '').charAt(0).toUpperCase() + (item.type || '').slice(1);
+                const icon = isFlight ? 'fa-plane' : getTransportIcon(item.type);
+                const deleteBtn = isFlight ? '' : `<button type="button" onclick="deleteTransport(${item._index})" class="text-red-500 hover:text-red-700 text-sm font-semibold flex-shrink-0"><i class="fa-solid fa-trash"></i></button>`;
+                
+                return `
+                    <div class="bg-gradient-to-br from-slate-50 to-slate-100 p-4 rounded-2xl border border-slate-200 hover:border-brand-300 hover:shadow-md transition">
+                        <div class="flex items-start justify-between gap-3 mb-3">
+                            <div class="flex items-center gap-3 flex-1 min-w-0">
+                                <div class="w-10 h-10 rounded-lg ${isFlight ? 'bg-blue-100 text-blue-600' : 'bg-brand-100 text-brand-600'} flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid ${icon}"></i>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <h4 class="font-bold text-slate-900 capitalize">${escapeHtml(typeLabel)}${isFlight ? ` ${escapeHtml(type)}` : ''}</h4>
+                                    <p class="text-sm text-slate-600">${escapeHtml(from)} → ${escapeHtml(to)}</p>
+                                </div>
                             </div>
-                            <div class="min-w-0 flex-1">
-                                <h4 class="font-bold text-slate-900 capitalize">${escapeHtml(transport.type)}</h4>
-                                <p class="text-sm text-slate-600">${escapeHtml(transport.from)} → ${escapeHtml(transport.to)}</p>
+                            ${deleteBtn}
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs mb-3">
+                            <div>
+                                <span class="text-slate-500 block">Departure</span>
+                                <span class="text-slate-900 font-semibold">${escapeHtml(formatTransportDateTime(departure))}</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block">Arrival</span>
+                                <span class="text-slate-900 font-semibold">${escapeHtml(arrival ? formatTransportDateTime(arrival) : '—')}</span>
                             </div>
                         </div>
-                        <button type="button" onclick="deleteTransport(${index})" class="text-red-500 hover:text-red-700 text-sm font-semibold flex-shrink-0">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
 
-                    <div class="grid grid-cols-2 gap-2 text-xs mb-3">
-                        <div>
-                            <span class="text-slate-500 block">Departure</span>
-                            <span class="text-slate-900 font-semibold">${escapeHtml(formatTransportDateTime(transport.departureTime))}</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-500 block">Arrival</span>
-                            <span class="text-slate-900 font-semibold">${escapeHtml(transport.arrivalTime ? formatTransportDateTime(transport.arrivalTime) : '—')}</span>
-                        </div>
+                        ${bookingRef ? `<div class="text-xs"><span class="text-slate-500">Booking Reference:</span> <span class="font-mono font-bold text-emerald-600">${escapeHtml(bookingRef)}</span></div>` : ''}
+                        ${provider ? `<div class="text-xs text-slate-600"><span class="text-slate-500">${isFlight ? 'Airline' : 'Provider'}:</span> ${escapeHtml(provider)}</div>` : ''}
+                        ${price ? `<div class="text-xs"><span class="text-slate-500">Price:</span> <span class="font-bold text-brand-600">$${Number(price).toFixed(2)}</span></div>` : ''}
+                        ${notes ? `<div class="text-xs text-slate-700 mt-2 p-2 bg-white rounded border border-slate-100"><span class="text-slate-500">Notes:</span> ${escapeHtml(notes)}</div>` : ''}
                     </div>
-
-                    ${transport.bookingRef ? `<div class="text-xs"><span class="text-slate-500">Booking Reference:</span> <span class="font-mono font-bold text-emerald-600">${escapeHtml(transport.bookingRef)}</span></div>` : ''}
-                    ${transport.provider ? `<div class="text-xs text-slate-600"><span class="text-slate-500">Provider:</span> ${escapeHtml(transport.provider)}</div>` : ''}
-                    ${transport.price ? `<div class="text-xs"><span class="text-slate-500">Price:</span> <span class="font-bold text-brand-600">$${Number(transport.price).toFixed(2)}</span></div>` : ''}
-                    ${transport.notes ? `<div class="text-xs text-slate-700 mt-2 p-2 bg-white rounded border border-slate-100"><span class="text-slate-500">Notes:</span> ${escapeHtml(transport.notes)}</div>` : ''}
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
 
@@ -1579,6 +1685,7 @@
 
         function saveTripData() {
             renderDashboard();
+            switchDay(currentActiveDay);
             saveRemotePlan().catch(err => console.error('Failed to save trip data:', err));
         }
 

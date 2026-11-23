@@ -1,0 +1,113 @@
+{
+  "trip": {
+    "name": "New York City Holiday Magic",
+    "startDate": "2026-12-12",
+    "endDate": "2026-12-23"
+  },
+  "title": "New York City Holiday Magic",
+  "subtitle": "Festive lights, Broadway shows, holiday markets, and comfortable split stays.",
+  "weather": "-12C to 6°C",
+  "heroImage": "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=1200&h=600&fit=crop",
+  "confirmed": {
+    "flights": [
+      {
+        "flight": "BW520",
+        "from": "POS",
+        "to": "JFK",
+        "departure": "2026-12-12T12:10:00",
+        "arrival": "2026-12-12T16:30:00"
+      },
+      {
+        "flight": "BW525",
+        "from": "JFK",
+        "to": "POS",
+        "departure": "2026-12-23T18:00:00",
+        "arrival": "2026-12-23T23:45:00"
+      }
+    ],
+    "transports": [
+      {
+        "type": "bus",
+        "from": "JFK Airport Terminal 4",
+        "to": "Times Square Area",
+        "departureTime": "17:00",
+        "arrivalTime": "18:30",
+        "bookingRef": "MEGABUS-NYC-001",
+        "price": "15.00",
+        "provider": "Megabus"
+      },
+      {
+        "type": "train",
+        "from": "Penn Station, NYC",
+        "to": "South Station, Boston",
+        "departureTime": "2026-12-16 10:00",
+        "arrivalTime": "2026-12-16 13:45",
+        "bookingRef": "AMTRAK-45678",
+        "price": "85.00",
+        "provider": "Amtrak"
+      },
+      {
+        "type": "train",
+        "from": "South Station, Boston",
+        "to": "Penn Station, NYC",
+        "departureTime": "2026-12-18 14:00",
+        "arrivalTime": "2026-12-18 17:30",
+        "bookingRef": "AMTRAK-45679",
+        "price": "85.00",
+        "provider": "Amtrak"
+      },
+      {
+        "type": "metro",
+        "from": "Port Authority Bus Terminal",
+        "to": "Central Park South (59th St)",
+        "departureTime": "09:00",
+        "arrivalTime": "09:15",
+        "price": "2.90",
+        "provider": "MTA New York City Transit"
+      },
+      {
+        "type": "metro",
+        "from": "5th Ave (53rd St)",
+        "to": "Times Square (42nd St)",
+        "departureTime": "14:30",
+        "arrivalTime": "14:40",
+        "price": "2.90",
+        "provider": "MTA New York City Transit"
+      },
+      {
+        "type": "uber",
+        "from": "Hotel",
+        "to": "Broadway Theater District",
+        "departureTime": "19:00",
+        "arrivalTime": "19:20",
+        "price": "12.50",
+        "provider": "Uber"
+      }
+    ],
+    "hotels": [
+      {
+        "name": "The Gregorian Hotel",
+        "address": "156 E 32nd St, New York, NY 10016",
+        "from": "2026-12-12",
+        "to": "2026-12-17"
+      },
+      {
+        "name": "DoubleTree Times Square South",
+        "address": "1568 Broadway at 47th St, New York, NY 10036",
+        "from": "2026-12-17",
+        "to": "2026-12-23"
+      }
+    ]
+  },
+  "events": {
+    "1": [
+      {
+        "id": "immigration",
+        "title": "Immigration",
+        "from": "04:50",
+        "to": "06:00",
+        "location": "John F. Kennedy International Airport, JFK Access Road, Queens, Queens County, New York, 11430, United States"
+      }
+    ]
+  }
+}
